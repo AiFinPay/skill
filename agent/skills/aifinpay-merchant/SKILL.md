@@ -5,6 +5,11 @@ description: Turn any website or API into one that charges AI agents to access
   in stablecoins or native tokens on Polygon and Solana. Non-custodial — you
   keep 99%.
 license: MIT
+version: 2.0.12
+author: AiFinPay Support
+metadata:
+  hermes:
+    tags: [payments, ai-agents, x402, api-monetization]
 ---
 # AiFinPay for merchants — charge AI agents instead of being scraped
 

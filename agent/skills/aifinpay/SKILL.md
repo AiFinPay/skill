@@ -4,6 +4,11 @@ description: Discover an agent wallet, retrieve payment history and prepaid
   quotas, resolve public Agent Passport identities, and inspect dev payment
   quotes through AiFinPay MCP/SDK.
 license: MIT
+version: 2.0.12
+author: AiFinPay Support
+metadata:
+  hermes:
+    tags: [payments, ai-agents, x402, stablecoins]
 ---
 # AiFinPay — payment rail for autonomous agents
 

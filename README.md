@@ -43,6 +43,17 @@ claude plugin marketplace add AiFinPay/skill
 claude plugin install aifinpay@aifinpay-marketplace
 ```
 
+### Hermes Agent
+
+Install either skill directly from GitHub into Hermes's skill directory:
+
+```bash
+hermes skills install https://raw.githubusercontent.com/AiFinPay/skill/main/agent/skills/aifinpay/SKILL.md --name aifinpay
+hermes skills install https://raw.githubusercontent.com/AiFinPay/skill/main/agent/skills/aifinpay-merchant/SKILL.md --name aifinpay-merchant
+```
+
+Installed skills are available as `/aifinpay` and `/aifinpay-merchant` in new Hermes sessions. Hermes follows the same Agent Skills-compatible `SKILL.md` format, so no adapter or additional runtime is required.
+
 Or copy `agent/skills/<name>/SKILL.md` into your client's skills directory.
 
 ## Source of truth

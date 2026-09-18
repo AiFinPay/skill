@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.0.12
+
+- Adds Hermes Agent metadata and installation guidance for both skills.
+
 ## 2.0.11
 
 - Adds Claude Code marketplace metadata and fixes plugin skill paths for the shipped `agent/skills/` layout.
