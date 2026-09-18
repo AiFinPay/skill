@@ -15,6 +15,14 @@ the other side exists.
 
 ## Install
 
+Install the skills with the `skills` CLI:
+
+```bash
+npx skills add AiFinPay/skill
+```
+
+You can also install the npm package:
+
 ```bash
 npm install @aifinpay/skill
 ```

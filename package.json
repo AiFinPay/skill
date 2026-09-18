@@ -1,10 +1,10 @@
 {
   "name": "@aifinpay/skill",
-  "version": "2.0.9",
+  "version": "2.0.10",
   "description": "AiFinPay agent skills: pay for x402-gated APIs as an agent (aifinpay) and charge agents for your API as a merchant (aifinpay-merchant).",
   "type": "module",
   "files": [
-    "skills",
+    "agent",
     "README.md",
     "LICENSE",
     ".claude-plugin",
@@ -32,13 +32,13 @@
   ],
   "author": "AiFinPay Support <contact@aifinpay.io>",
   "license": "MIT",
-  "homepage": "https://github.com/AiFinPay/sdk#readme",
+  "homepage": "https://github.com/AiFinPay/skill#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/AiFinPay/sdk.git",
+    "url": "git+https://github.com/AiFinPay/skill.git",
     "directory": "skill"
   },
-  "bugs": "https://github.com/AiFinPay/sdk/issues",
+  "bugs": "https://github.com/AiFinPay/skill/issues",
   "engines": {
     "node": ">=22"
   },

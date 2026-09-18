@@ -5,3 +5,5 @@ CHANGELOG.md
 .aiignore
 .gitignore
 *.tgz
+.agents
+skills-lock.json
