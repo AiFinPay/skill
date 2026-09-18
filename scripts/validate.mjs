@@ -2,11 +2,12 @@ import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 
 const root = new URL("..", import.meta.url).pathname;
+const skillsRoot = join(root, "agent", "skills");
 const skills = ["aifinpay", "aifinpay-merchant"];
 let failed = false;
 
 for (const name of skills) {
-  const path = join(root, "skills", name, "SKILL.md");
+  const path = join(skillsRoot, name, "SKILL.md");
   let text;
   try {
     text = readFileSync(path, "utf8");
@@ -40,7 +41,7 @@ for (const name of skills) {
 }
 
 // No stray top-level skill files besides the index shim.
-const topLevel = readdirSync(join(root, "skills"));
+const topLevel = readdirSync(skillsRoot);
 console.log(`skills/: ${topLevel.join(", ")}`);
 
 if (failed) process.exit(1);

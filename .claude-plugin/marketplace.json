@@ -1,0 +1,26 @@
+{
+
+  "name": "aifinpay-marketplace",
+  "owner": {
+    "name": "AiFinPay Support",
+    "email": "contact@aifinpay.io",
+    "url": "https://aifinpay.io"
+  },
+  "description": "AiFinPay payment skills for agents and API merchants.",
+  "plugins": [
+    {
+      "name": "aifinpay",
+      "source": "./",
+      "description": "Payment rail skills for paying agents and API merchants.",
+      "version": "2.0.11",
+      "author": {
+        "name": "AiFinPay Support",
+        "email": "contact@aifinpay.io"
+      },
+      "homepage": "https://aifinpay.io",
+      "repository": "https://github.com/AiFinPay/skill",
+      "license": "MIT",
+      "keywords": ["ai-agents", "payments", "x402", "stablecoins"]
+    }
+  ]
+}

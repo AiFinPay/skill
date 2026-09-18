@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.0.11
+
+- Adds Claude Code marketplace metadata and fixes plugin skill paths for the shipped `agent/skills/` layout.
+
 ## 2.0.9
 
 - Minimum Node engine is now 22 (`engines: >=22`). Node 18/20 are no

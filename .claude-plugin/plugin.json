@@ -1,10 +1,10 @@
 {
   "name": "aifinpay",
   "description": "Payment rail for AI agents: pay for x402 APIs or charge agents for yours.",
-  "version": "2.0.0",
+  "version": "2.0.11",
   "author": { "name": "AiFinPay Support" },
   "homepage": "https://aifinpay.io",
-  "repository": "https://github.com/AiFinPay/sdk",
+  "repository": "https://github.com/AiFinPay/skill",
   "license": "MIT",
-  "skills": ["./skills/aifinpay", "./skills/aifinpay-merchant"]
+  "skills": ["./agent/skills/aifinpay", "./agent/skills/aifinpay-merchant"]
 }

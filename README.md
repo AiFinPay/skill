@@ -27,7 +27,23 @@ You can also install the npm package:
 npm install @aifinpay/skill
 ```
 
-Or copy `skills/<name>/SKILL.md` into your client's skills directory.
+### Claude Code marketplace
+
+Add the GitHub-hosted marketplace, then install the plugin:
+
+```text
+/plugin marketplace add AiFinPay/skill
+/plugin install aifinpay@aifinpay-marketplace
+```
+
+Or use the CLI:
+
+```bash
+claude plugin marketplace add AiFinPay/skill
+claude plugin install aifinpay@aifinpay-marketplace
+```
+
+Or copy `agent/skills/<name>/SKILL.md` into your client's skills directory.
 
 ## Source of truth
 
