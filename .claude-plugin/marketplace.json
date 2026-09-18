@@ -12,7 +12,7 @@
       "name": "aifinpay",
       "source": "./",
       "description": "Payment rail skills for paying agents and API merchants.",
-      "version": "2.0.12",
+      "version": "2.0.14",
       "author": {
         "name": "AiFinPay Support",
         "email": "contact@aifinpay.io"

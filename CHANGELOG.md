@@ -1,5 +1,13 @@
 # Changelog
 
+## 2.0.14
+
+- Adds metadata and installation guidance for OpenAI Codex, OpenCode, and Aider — completing support for the top 10 most popular AI coding agents (Claude Code, Cursor, GitHub Copilot, Windsurf, Kimi, Qwen, Gemini, Hermes, Codex, OpenCode, Aider).
+
+## 2.0.13
+
+- Adds metadata and installation guidance for Kimi, Qwen, Gemini, GitHub Copilot, Cursor, and Windsurf.
+
 ## 2.0.12
 
 - Adds Hermes Agent metadata and installation guidance for both skills.
