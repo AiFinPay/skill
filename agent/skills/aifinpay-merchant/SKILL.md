@@ -5,7 +5,7 @@ description: Turn any website or API into one that charges AI agents to access
   in stablecoins or native tokens on Polygon and Solana. Non-custodial — you
   keep 99%.
 license: MIT
-version: 2.0.14
+version: 2.0.15
 author: AiFinPay Support
 metadata:
   hermes:
@@ -80,6 +80,27 @@ an agent that arrives at just your domain learns which routes cost money.
 > framework-free. On Next.js, call the gate logic in a route handler and return
 > its 402 body; serve `buildDiscoveryDocument({...})` as JSON from
 > `app/.well-known/x402.json/route.ts`.
+
+## Discovery ownership and settlement compatibility
+
+`aifpDiscovery({ merchantId, resources })` serves a document generated from the
+resource definitions in your application. Self-hosted routes are maintained in
+your code; installing gate does not upload their catalog to AiFinPay. Publish
+`/.well-known/x402.json` and link it from `llms.txt` using the correct origin or
+a relative URL. Keep dev and production catalogs separate. An API catalog such
+as `/api/agent` can additionally describe query/body parameters.
+
+Gate 0.3.3 source adds `instructions_url` (payer skill),
+`merchant_instructions_url` (this skill), and `documentation_url`. These are
+links to maintained public instructions, not stored wallet or receipt data.
+Existing sites must upgrade/redeploy gate to emit those new fields.
+
+The native-payment candidate requires a merchant explicitly registered for
+`settlement_version: "1.4"` on a served Polygon deployment. Existing merchants
+retain their prior version until their owner updates it. The backend candidate
+accepts this setting at registration and authenticated update; version changes
+must be coordinated with runtime readiness. Do not change the payout wallet
+or claim compatibility merely because discovery returns 200.
 
 ## Register the site (get your merchant_id)
 

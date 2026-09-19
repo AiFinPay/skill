@@ -1,3 +1,8 @@
+## 2.0.15 — unreleased
+
+- Correct published MCP version and describe the gated native v1.4 candidate with owner configuration and recovery.
+- Explain same-origin discovery ownership and public instruction links.
+
 # Changelog
 
 ## 2.0.14
