@@ -1,7 +1,7 @@
 {
   "name": "aifinpay",
   "description": "Payment rail for AI agents: pay for x402 APIs or charge agents for yours.",
-  "version": "2.0.14",
+  "version": "2.0.15",
   "author": { "name": "AiFinPay Support" },
   "homepage": "https://aifinpay.io",
   "repository": "https://github.com/AiFinPay/skill",
