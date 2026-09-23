@@ -166,8 +166,7 @@ The gate needs a `merchant_id`. Two ways to get one:
 2. The agent gets a quote, settles **on-chain from its own wallet** to the
    splitter contract.
 3. The contract splits atomically: **99% to your payout wallet**, 1% to
-   AiFinPay, in the same transaction. (On an AiFinPay pilot the 1% may be
-   waived until a date; you then receive 100%.)
+   AiFinPay, in the same transaction.
 4. The agent retries with a receipt; your gate verifies it and serves the data.
 
 You never touch the agent's funds, and AiFinPay never holds yours. The split

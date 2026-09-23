@@ -9,7 +9,7 @@
   owner's dashboard (MCP `agent_claim_self`, Node `signDashboardClaim`, Python
   `sign_dashboard_claim`) right after a wallet is created.
 - Merchant skill: a working Next.js `createGate` middleware that copies the
-  gate's headers on both branches; v1.4 settlement wording; pilot fee waiver.
+  gate's headers on both branches; v1.4 settlement wording.
 
 ## 2.0.15 — unreleased
 
