@@ -1,3 +1,16 @@
+## 2.1.0 — 2026-09-23
+
+- Payer skill: payments are released. MCP `payable_fetch` (2.2.0+) and Node
+  `fetchPaid` (2.1.0+) pay; the Python SDK does not yet. Replaces the text that
+  called MCP read-only and payments "release pending", which made agents refuse
+  to pay.
+- Payer skill: network access a sandbox must allow, the $0.10 minimum batch,
+  POL funding, `init` passphrase requirement, and linking the agent to its
+  owner's dashboard (MCP `agent_claim_self`, Node `signDashboardClaim`, Python
+  `sign_dashboard_claim`) right after a wallet is created.
+- Merchant skill: a working Next.js `createGate` middleware that copies the
+  gate's headers on both branches; v1.4 settlement wording.
+
 ## 2.0.15 — unreleased
 
 - Correct published MCP version and describe the gated native v1.4 candidate with owner configuration and recovery.
