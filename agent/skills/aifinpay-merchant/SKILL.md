@@ -5,7 +5,7 @@ description: Turn any website or API into one that charges AI agents to access
   in stablecoins or native tokens on Polygon and Solana. Non-custodial — you
   keep 99%.
 license: MIT
-version: 2.0.15
+version: 2.1.0
 author: AiFinPay Support
 metadata:
   hermes:
@@ -76,10 +76,42 @@ That is it. `aifpGate` returns a 402 with everything an agent needs to pay
 (`how_to_pay`, price, scope). `aifpDiscovery` serves `/.well-known/x402.json` so
 an agent that arrives at just your domain learns which routes cost money.
 
-> **Not Express?** `aifpGate` is Express middleware, but the pieces are
-> framework-free. On Next.js, call the gate logic in a route handler and return
-> its 402 body; serve `buildDiscoveryDocument({...})` as JSON from
-> `app/.well-known/x402.json/route.ts`.
+### Next.js
+
+`aifpGate` is Express middleware and does not run in `middleware.ts`. Use
+`createGate` and copy its headers onto the response on **both** branches — the
+402 carries the payment headers and a paid 200 carries `AIFP-Quota-Remaining`.
+An adapter that drops them leaves agents unable to pay or to see what is left.
+
+```ts
+// middleware.ts
+import { NextResponse, type NextRequest } from "next/server";
+import { createGate, knownAiAgent } from "@aifinpay/gate";
+
+const gate = createGate({
+  merchantId: process.env.AIFP_MERCHANT_ID!,
+  registry,             // your paid routes
+  store,                // shared, e.g. redisStore(redis)
+  shouldCharge: knownAiAgent,
+});
+
+export async function middleware(req: NextRequest) {
+  const result = await gate({
+    path: req.nextUrl.pathname,
+    header: (name) => req.headers.get(name) ?? undefined,
+  });
+  const res = result.ok ? NextResponse.next() : NextResponse.json(result.body, { status: result.status });
+  for (const [name, value] of Object.entries(result.headers)) res.headers.set(name, value);
+  return res;
+}
+
+// Every paid PAGE and API path must be matched, or it is served free.
+export const config = { matcher: ["/api/:path*", "/movies/:path*"] };
+```
+
+Serve `buildDiscoveryDocument({...})` as JSON from
+`app/.well-known/x402.json/route.ts`. Full reference: the gate README
+(https://github.com/AiFinPay/sdk/tree/main/gate).
 
 ## Discovery ownership and settlement compatibility
 
@@ -95,11 +127,9 @@ Gate 0.3.3 source adds `instructions_url` (payer skill),
 links to maintained public instructions, not stored wallet or receipt data.
 Existing sites must upgrade/redeploy gate to emit those new fields.
 
-The native-payment candidate requires a merchant explicitly registered for
-`settlement_version: "1.4"` on a served Polygon deployment. Existing merchants
-retain their prior version until their owner updates it. The backend candidate
-accepts this setting at registration and authenticated update; version changes
-must be coordinated with runtime readiness. Do not change the payout wallet
+Agents using MCP `payable_fetch` or Node `fetchPaid` pay merchants registered
+for `settlement_version: "1.4"` on Polygon. Existing merchants keep their prior
+version until their owner updates it at registration or in the dashboard. Do not change the payout wallet
 or claim compatibility merely because discovery returns 200.
 
 ## Register the site (get your merchant_id)
@@ -136,7 +166,8 @@ The gate needs a `merchant_id`. Two ways to get one:
 2. The agent gets a quote, settles **on-chain from its own wallet** to the
    splitter contract.
 3. The contract splits atomically: **99% to your payout wallet**, 1% to
-   AiFinPay, in the same transaction.
+   AiFinPay, in the same transaction. (On an AiFinPay pilot the 1% may be
+   waived until a date; you then receive 100%.)
 4. The agent retries with a receipt; your gate verifies it and serves the data.
 
 You never touch the agent's funds, and AiFinPay never holds yours. The split
