@@ -5,7 +5,7 @@ description: Pay for x402-gated APIs and sites as an agent (AIFP-1 on Polygon,
   and read wallet, payment history, prepaid quotas and Agent Passport records
   through the AiFinPay MCP server or SDK.
 license: MIT
-version: 2.3.0
+version: 2.4.0
 author: AiFinPay Support
 metadata:
   hermes:
@@ -60,7 +60,7 @@ your language. There is no "install together" scenario.
 
 ## Version and release status
 
-Released and current: MCP **2.3.0**, Node SDK **2.2.0**, Python **2.2.0**.
+Released and current: MCP **2.3.0**, Node SDK **2.2.0**, Python **2.2.1**.
 Payments are released — `payable_fetch` has shipped since MCP 2.2.0. An older
 copy of this skill that calls MCP "read-only" or payments "release pending" is
 out of date; follow this one. Install the `latest` release.

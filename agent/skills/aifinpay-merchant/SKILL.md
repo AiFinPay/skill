@@ -5,7 +5,7 @@ description: Turn any website or API into one that charges AI agents to access
   in stablecoins or native tokens on Polygon and Solana. Non-custodial — you
   keep 99%.
 license: MIT
-version: 2.3.0
+version: 2.4.0
 author: AiFinPay Support
 metadata:
   hermes:
@@ -81,12 +81,29 @@ facilitator — there is no `/verify` or `/settle` to point your middleware at,
 and swapping a facilitator URL does nothing. Mount the gate next to it and
 route by header: a request carrying `AIFP-Receipt` goes to AiFinPay.
 
-**Python server?** There is no Python gate package yet. A Python gate must
-verify `AIFP-Receipt` as an EdDSA JWT against
-`https://api.aifinpay.io/.well-known/jwks.json` (issuer
-`https://api.aifinpay.io`, `aud` = your `merchant_id`, `scope`/`resource`
-covering the path, `network_mode` live) and meter its `unit_quota` — the same
-checks `@aifinpay/gate` makes.
+### Python (FastAPI, Starlette, Flask, Django)
+
+```bash
+pip install aifinpay-gate
+```
+
+```python
+from aifinpay_gate import AifpGateMiddleware, Gate, Route
+
+gate = Gate("mrch_…", routes=[
+    Route("/api/agent/data", "standard"),
+    Route("/create", "premium", methods={"POST"}),
+])
+app.add_middleware(AifpGateMiddleware, gate=gate)   # FastAPI / Starlette
+# Flask / Django:  app.wsgi_app = AifpGateWSGI(app.wsgi_app, gate)
+```
+
+Same 402, same receipt checks, same metering as `@aifinpay/gate`; it also
+serves `/.well-known/x402.json`. A paid call reaches the handler with
+`request.state.aifp` (ASGI) or `environ["aifp"]` (WSGI). Route patterns are
+exact or end in `/*`. With more than one worker process, pass
+`store=RedisStore(redis.Redis.from_url(...))` — the default counters are
+per process.
 
 ### Next.js
 
