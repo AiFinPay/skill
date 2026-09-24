@@ -5,7 +5,7 @@ description: Pay for x402-gated APIs and sites as an agent (AIFP-1 on Polygon,
   and read wallet, payment history, prepaid quotas and Agent Passport records
   through the AiFinPay MCP server or SDK.
 license: MIT
-version: 2.2.0
+version: 2.3.0
 author: AiFinPay Support
 metadata:
   hermes:
@@ -41,7 +41,7 @@ metadata:
 wallet, within limits its owner sets, and gets a receipt that unlocks a batch of
 requests. Settlement is non-custodial: the agent's private key signs locally and
 no AiFinPay-controlled custodian touches funds. MCP `payable_fetch` (2.2.0+) and
-Node `fetchPaid` (2.1.0+) execute payments; the Python SDK does not yet.
+Node `fetchPaid` (2.1.0+) and Python `fetch_paid` (2.2.0+) execute payments.
 
 ## Prerequisites — required packages
 
@@ -60,7 +60,7 @@ your language. There is no "install together" scenario.
 
 ## Version and release status
 
-Released and current: MCP **2.3.0**, Node SDK **2.2.0**, Python **2.1.1**.
+Released and current: MCP **2.3.0**, Node SDK **2.2.0**, Python **2.2.0**.
 Payments are released — `payable_fetch` has shipped since MCP 2.2.0. An older
 copy of this skill that calls MCP "read-only" or payments "release pending" is
 out of date; follow this one. Install the `latest` release.
@@ -69,7 +69,7 @@ out of date; follow this one. Install the `latest` release.
 |---|---|
 | MCP `@aifinpay/mcp` 2.3.x | Yes — `payable_fetch`, once the owner enables payments; POL, or USDC with `AIFINPAY_PAY_ASSET=USDC` |
 | Node `@aifinpay/agent` 2.2.x | Yes — `fetchPaid` with a v14 journal and gas cap; POL (with your own POL/USD rate) or USDC (`v14.asset: "USDC"`) |
-| Python `aifinpay-agent` | No — use MCP or Node to pay |
+| Python `aifinpay-agent` 2.2.x | Yes — `agent.fetch_paid(url, allowed_origins=…, max_amount_usd=…, daily_amount_usd=…)`; POL (priced independently) or USDC (`asset="USDC"`); recover an unconfirmed payment with `agent.recover_paid(journal_path)` |
 
 # AiFinPay agent workflow
 

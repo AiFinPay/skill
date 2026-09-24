@@ -1,3 +1,12 @@
+## 2.3.0 — 2026-09-24
+
+- Payer skill: Python `aifinpay-agent` 2.2.0 pays — `agent.fetch_paid(...)` in
+  POL or USDC, `agent.recover_paid(journal_path)` after an unconfirmed payment.
+  Current versions: MCP 2.3.0, Node 2.2.0, Python 2.2.0.
+- Merchant skill: AiFinPay is not an x402 facilitator (run the gate next to an
+  existing x402 middleware, route by `AIFP-Receipt`); what a Python gate must
+  check; API registration with one `pay_to.evm`, claim, and moving the payout.
+
 ## 2.2.0 — 2026-09-24
 
 - Payer skill: agents can pay in USDC. MCP 2.3.0 `payable_fetch` pays in USDC
