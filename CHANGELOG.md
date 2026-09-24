@@ -1,3 +1,10 @@
+## 2.4.0 — 2026-09-24
+
+- Merchant skill: Python servers use `pip install aifinpay-gate` (ASGI for
+  FastAPI/Starlette, WSGI for Flask/Django) instead of hand-written checks.
+- Payer skill: Python `aifinpay-agent` 2.2.1 (default gas cap that lets USDC
+  purchases through at current Polygon fees).
+
 ## 2.3.0 — 2026-09-24
 
 - Payer skill: Python `aifinpay-agent` 2.2.0 pays — `agent.fetch_paid(...)` in
