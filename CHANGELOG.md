@@ -1,3 +1,10 @@
+## 2.2.0 — 2026-09-24
+
+- Payer skill: agents can pay in USDC. MCP 2.3.0 `payable_fetch` pays in USDC
+  when the owner sets `AIFINPAY_PAY_ASSET=USDC` (USDC for the batch plus a little
+  POL for gas); Node 2.2.0 `fetchPaid` with `v14: { asset: "USDC" }`. Current
+  versions: MCP 2.3.0, Node 2.2.0, Python 2.1.1 (does not pay).
+
 ## 2.1.0 — 2026-09-23
 
 - Payer skill: payments are released. MCP `payable_fetch` (2.2.0+) and Node
