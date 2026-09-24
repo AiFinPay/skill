@@ -5,7 +5,7 @@ description: Turn any website or API into one that charges AI agents to access
   in stablecoins or native tokens on Polygon and Solana. Non-custodial — you
   keep 99%.
 license: MIT
-version: 2.2.0
+version: 2.3.0
 author: AiFinPay Support
 metadata:
   hermes:
@@ -75,6 +75,18 @@ app.use(aifpDiscovery({
 That is it. `aifpGate` returns a 402 with everything an agent needs to pay
 (`how_to_pay`, price, scope). `aifpDiscovery` serves `/.well-known/x402.json` so
 an agent that arrives at just your domain learns which routes cost money.
+
+**Already running x402 (PayAI, Coinbase)?** AiFinPay is not an x402
+facilitator — there is no `/verify` or `/settle` to point your middleware at,
+and swapping a facilitator URL does nothing. Mount the gate next to it and
+route by header: a request carrying `AIFP-Receipt` goes to AiFinPay.
+
+**Python server?** There is no Python gate package yet. A Python gate must
+verify `AIFP-Receipt` as an EdDSA JWT against
+`https://api.aifinpay.io/.well-known/jwks.json` (issuer
+`https://api.aifinpay.io`, `aud` = your `merchant_id`, `scope`/`resource`
+covering the path, `network_mode` live) and meter its `unit_quota` — the same
+checks `@aifinpay/gate` makes.
 
 ### Next.js
 
@@ -150,6 +162,13 @@ The gate needs a `merchant_id`. Two ways to get one:
    Do not guess a `merchant_id` or invent a payout address. The owner sets the
    payout wallet; that is the address money is sent to, and only they can choose
    it.
+3. **API (scripts):** `POST https://api.aifinpay.io/v1/merchants` with
+   `{"name", "pay_to": {"evm": "0x…"}, "settlement_version": "1.4"}` returns the
+   id and a `merchant_secret` shown once. Claim the merchant in the dashboard
+   with that secret, or it belongs to no account. Send ONE `pay_to.evm` — it
+   receives on every EVM chain; per-chain keys such as `base` are refused. To
+   move the payout later, `PATCH /v1/merchants/{id}` with header
+   `AIFP-Merchant-Secret` and `{"pay_to": {"evm": "0x…"}}`.
 
 ## What the owner must decide
 
