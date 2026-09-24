@@ -5,7 +5,7 @@ description: Turn any website or API into one that charges AI agents to access
   in stablecoins or native tokens on Polygon and Solana. Non-custodial — you
   keep 99%.
 license: MIT
-version: 2.1.0
+version: 2.2.0
 author: AiFinPay Support
 metadata:
   hermes:
