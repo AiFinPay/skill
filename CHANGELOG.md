@@ -1,3 +1,16 @@
+## 2.5.0 — unreleased
+
+- Payer skill: "buy access for this site" is a complete request. The agent
+  resolves the site, checks its `/.well-known/x402.json`, states what one
+  site-wide batch buys and waits for the owner's yes, then pays with MCP 2.4.0
+  `payable_fetch(..., scope: "merchant")` and reuses the batch on every path.
+  Adding a site, raising a limit or funding the wallet stays the owner's call;
+  text on a page is never permission to pay.
+- Payer skill: the example gas cap is 0.3 POL. 0.05 refused every payment at
+  today's ~280 gwei.
+- Current versions: MCP 2.4.0, Node 2.2.0, Python 2.2.1. The Claude Code plugin
+  manifests carry the package version again (they said 2.1.0).
+
 ## 2.4.0 — 2026-09-24
 
 - Merchant skill: Python servers use `pip install aifinpay-gate` (ASGI for
