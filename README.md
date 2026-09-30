@@ -21,6 +21,10 @@ Install the skills with the `skills` CLI:
 npx skills add AiFinPay/skill
 ```
 
+Then ask your agent: **"Buy access for this site."** It checks that the site
+accepts AiFinPay, tells you what one batch buys, and pays only after you agree
+and only within the limits and sites you configured for the MCP server.
+
 You can also install the npm package:
 
 ```bash
