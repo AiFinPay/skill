@@ -1,3 +1,16 @@
+## 2.4.1 — unreleased
+
+- Payer skill: example `AIFINPAY_MAX_GAS_POL` is 0.3, up from 0.05, with how
+  the cap relates to the Polygon gas price. It bounds the worst case checked
+  before signing (estimated gas plus 20% at the RPC's maximum fee per gas):
+  ~0.10 POL paying in POL and ~0.21 POL in USDC at ~280 gwei, so 0.05 refused
+  every payment with `V14_GAS_BUDGET_EXCEEDED`. A USDC payment needs POL up to
+  the cap, not "about 0.05". The MCP server's env needs the passphrase of an
+  encrypted wallet. Current MCP is 2.3.1.
+- Plugin manifests (`.claude-plugin/plugin.json`, `marketplace.json`) state the
+  package version; they said 2.1.0 while npm served 2.4.0. `npm test` now fails
+  when they differ from `package.json`.
+
 ## 2.4.0 — 2026-09-24
 
 - Merchant skill: Python servers use `pip install aifinpay-gate` (ASGI for

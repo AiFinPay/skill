@@ -60,7 +60,7 @@ your language. There is no "install together" scenario.
 
 ## Version and release status
 
-Released and current: MCP **2.3.0**, Node SDK **2.2.0**, Python **2.2.1**.
+Released and current: MCP **2.3.1**, Node SDK **2.2.0**, Python **2.2.1**.
 Payments are released — `payable_fetch` has shipped since MCP 2.2.0. An older
 copy of this skill that calls MCP "read-only" or payments "release pending" is
 out of date; follow this one. Install the `latest` release.
@@ -91,17 +91,28 @@ The owner configures these MCP environment values (example limits only):
   "AIFINPAY_GATEWAY_PATH_MODE": "direct",
   "AIFINPAY_MAX_USD": "0.15",
   "AIFINPAY_DAILY_USD": "1.00",
-  "AIFINPAY_MAX_GAS_POL": "0.05"
+  "AIFINPAY_MAX_GAS_POL": "0.3"
 }
 ```
 
 The smallest batch is **$0.10 plus gas** on **Polygon**; keep `AIFINPAY_MAX_USD`
 a little above the batch you expect to buy. It is paid in **POL** by default.
+
+`AIFINPAY_MAX_GAS_POL` caps the worst case, not the expected fee. Before
+signing, the client prices the estimated gas plus 20% at the maximum fee per gas
+the Polygon RPC quotes, and refuses with `V14_GAS_BUDGET_EXCEEDED` if that
+exceeds the cap. The worst case follows the gas price: at about 280 gwei
+(September 2026) it is about 0.10 POL paying in POL and about 0.21 POL paying in
+USDC, so `0.3` covers both; when gas is higher the owner raises the cap. The fee
+charged is usually a fraction of it, but the wallet must hold the batch plus the
+worst case. Only the owner can change the cap.
+
 To pay in **USDC** instead, the owner also sets `"AIFINPAY_PAY_ASSET": "USDC"`:
-the wallet then needs USDC for the batch plus a little POL (about 0.05) for gas,
+the wallet then needs USDC for the batch plus POL for gas up to the cap,
 because the tool approves exactly the batch amount and then settles — two
 transactions, both within `AIFINPAY_MAX_GAS_POL`. Use an existing persistent
-wallet or create one with `npx @aifinpay/mcp init` (a passphrase is required);
+wallet or create one with `npx @aifinpay/mcp init` (a passphrase is required,
+and the server's env needs the same `AIFINPAY_WALLET_PASSPHRASE`);
 fund its EVM address on Polygon with POL, or with USDC plus some POL. Funding a wallet does not establish
 unlimited spend authority. Use the owner's actual approved limits and origins,
 then call `payable_fetch({"url":"https://merchant.example/api/data"})`.
