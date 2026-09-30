@@ -1,3 +1,14 @@
+## 2.5.1 — unreleased
+
+- Payer skill: a USDC payment needs POL for the worst-case gas (about 0.21 POL
+  at ~280 gwei), not "about 0.05" — the client checks the native balance
+  against that worst case before signing and refuses with
+  `V14_INSUFFICIENT_BALANCE`. The wallet must hold the batch plus the worst
+  case; the MCP server's env needs the passphrase of an encrypted wallet.
+- `npm test` fails when `.claude-plugin/plugin.json` or `marketplace.json`
+  states a version other than `package.json`'s; they said 2.1.0 while npm
+  served 2.4.0.
+
 ## 2.5.0 — unreleased
 
 - Payer skill: "buy access for this site" is a complete request. The agent

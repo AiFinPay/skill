@@ -40,6 +40,21 @@ for (const name of skills) {
   console.log(`ok: ${name} (${text.length} chars)`);
 }
 
+// The Claude Code plugin manifests ship in the npm tarball and are what the
+// marketplace install reads. They said 2.1.0 while npm served 2.4.0.
+const version = JSON.parse(readFileSync(join(root, "package.json"), "utf8")).version;
+const plugin = JSON.parse(readFileSync(join(root, ".claude-plugin", "plugin.json"), "utf8"));
+const marketplace = JSON.parse(readFileSync(join(root, ".claude-plugin", "marketplace.json"), "utf8"));
+for (const [where, declared] of [
+  ["plugin.json", plugin.version],
+  ...marketplace.plugins.map((entry) => [`marketplace.json plugin "${entry.name}"`, entry.version]),
+]) {
+  if (declared !== version) {
+    console.error(`FAIL: .claude-plugin/${where} version is ${declared}, package.json is ${version}`);
+    failed = true;
+  }
+}
+
 // No stray top-level skill files besides the index shim.
 const topLevel = readdirSync(skillsRoot);
 console.log(`skills/: ${topLevel.join(", ")}`);
