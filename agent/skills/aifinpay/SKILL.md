@@ -141,12 +141,15 @@ The owner configures these MCP environment values (example limits only):
 The smallest batch is **$0.10 plus gas** on **Polygon**; keep `AIFINPAY_MAX_USD`
 a little above the batch you expect to buy. The gas cap has to cover the
 worst-case fee: at ~280 gwei that is about 0.10 POL for a POL payment and
-0.21 POL for USDC, and a lower cap refuses before anything is signed. It is paid in **POL** by default.
+0.21 POL for USDC, and a lower cap refuses before anything is signed. The fee
+charged is usually a fraction of that, but the wallet must hold the batch plus
+the worst case before it signs. It is paid in **POL** by default.
 To pay in **USDC** instead, the owner also sets `"AIFINPAY_PAY_ASSET": "USDC"`:
-the wallet then needs USDC for the batch plus a little POL (about 0.05) for gas,
-because the tool approves exactly the batch amount and then settles — two
-transactions, both within `AIFINPAY_MAX_GAS_POL`. Use an existing persistent
-wallet or create one with `npx @aifinpay/mcp init` (a passphrase is required);
+the wallet then needs USDC for the batch plus POL for the worst-case gas (about
+0.21 POL at ~280 gwei), because the tool approves exactly the batch amount and
+then settles — two transactions, both within `AIFINPAY_MAX_GAS_POL`. Use an existing persistent
+wallet or create one with `npx @aifinpay/mcp init` (a passphrase is required,
+and the MCP server's env needs the same `AIFINPAY_WALLET_PASSPHRASE`);
 fund its EVM address on Polygon with POL, or with USDC plus some POL. Funding a wallet does not establish
 unlimited spend authority. Use the owner's actual approved limits and origins,
 then call `payable_fetch({"url":"https://merchant.example/api/data"})`.
