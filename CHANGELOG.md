@@ -1,3 +1,14 @@
+## 2.6.0 — unreleased
+
+- Payer skill: Base. MCP 2.5 pays on the chain the owner sets in
+  `AIFINPAY_PAY_CHAIN` (`polygon` default, or `base`), with the gas cap in ETH
+  as `AIFINPAY_MAX_GAS`; `AIFINPAY_MAX_GAS_POL` is refused on Base. Fund the
+  same EVM address with ETH on Base. Node `v14.chain: "base"` and Python
+  `chain="base"` since SDK 2.3.0. Names MCP 2.5.0, SDK 2.3.0 and Python 2.3.0
+  as current.
+- Merchant skill: `"settlement_chain": "base"` at registration makes agents
+  pay that merchant on Base.
+
 ## 2.5.1 — unreleased
 
 - Payer skill: a USDC payment needs POL for the worst-case gas (about 0.21 POL
