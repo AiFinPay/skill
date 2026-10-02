@@ -183,7 +183,9 @@ The gate needs a `merchant_id`. Two ways to get one:
    `{"name", "pay_to": {"evm": "0x…"}, "settlement_version": "1.4"}` returns the
    id and a `merchant_secret` shown once. Claim the merchant in the dashboard
    with that secret, or it belongs to no account. Send ONE `pay_to.evm` — it
-   receives on every EVM chain; per-chain keys such as `base` are refused. To
+   receives on every EVM chain; per-chain keys such as `base` are refused. Agents
+   pay on Polygon unless the merchant adds `"settlement_chain": "base"`; then
+   quotes, and so payments, are on Base (ETH or USDC) to the same address. To
    move the payout later, `PATCH /v1/merchants/{id}` with header
    `AIFP-Merchant-Secret` and `{"pay_to": {"evm": "0x…"}}`.
 
