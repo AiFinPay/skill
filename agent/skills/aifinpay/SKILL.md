@@ -1,6 +1,6 @@
 ---
 name: aifinpay
-description: Pay for x402-gated APIs and sites as an agent (AIFP-1 on an owner-selected EVM network,
+description: Pay for x402-gated APIs and sites as an agent (AIFP-1 on an owner-selected EVM or accepted Solana network,
   within owner-set limits) — including when the owner just says "buy access for
   this site" — link the agent to its owner's AiFinPay dashboard, and read
   wallet, payment history, prepaid quotas and Agent Passport records through
@@ -149,6 +149,13 @@ provide both family options. Python uses `chain="solana"`, `environment`,
 journal and USD caps. Maintain a private persistent journal and the SDK's
 required prepared-transaction callback; do not remove persistence to make a
 payment proceed.
+
+Before requesting a Solana quote, the SDK durably retains the exact owner-signed
+authorization and request identity. After a timeout or restart, resume that same
+admission; do not generate a fresh nonce while its outcome is unknown. An expired
+authorization can reconcile an existing admission but cannot authorize a new
+one. Keep issued-quote evidence separate from a prepared transaction: quote
+expiry alone does not prove a refund of a backend reservation.
 
 The signed Solana transaction and its base58 signature are saved before
 broadcast. A timeout, expired blockhash or missing RPC result does not permit
@@ -299,14 +306,19 @@ agent's balance, payments and receipts, and can set a daily-spend email alert,
 at https://dash.aifinpay.io → My Agents:
 
 - **MCP:** the owner clicks **Claim via MCP**, gets a one-time URL and gives it
-  to you; call `agent_claim_self({"magic_link_url": "…"})`.
+  to you; call `agent_claim_self({"magic_link_url": "…"})`. The owner-selected
+  payment family must be bound successfully; the other wallet is best-effort.
+  Binding a wallet does not activate a disabled payment network. Use the
+  selected wallet's **Fund** panel for available networks and assets.
 - **Node / Python:** the owner uses **Add agent by address** and gives you the
   challenge; return `agent.signDashboardClaim(challenge)` (Node) or
   `agent.sign_dashboard_claim(challenge)` (Python). These sign only
   `AiFinPay-claim:polygon:<own address>:<nonce>`.
 
-Hard spending limits stay in the agent's own configuration (`AIFINPAY_MAX_USD`,
-`AIFINPAY_DAILY_USD`), not in the dashboard.
+Keep local owner spending limits in the agent's configuration (`AIFINPAY_MAX_USD`,
+`AIFINPAY_DAILY_USD`). Claimed-wallet controls in the dashboard are additional
+backend restrictions on quotes and gateway access; they do not replace local
+limits or control transactions sent directly outside AiFinPay.
 
 Discover routes on the exact requested origin: `/.well-known/x402.json` and any
 API catalog linked by that site. A dev hostname does not imply testnet. If a
@@ -371,8 +383,10 @@ price, AiFinPay takes **1 %** (100 bps) from it, and the merchant receives
 **99 %**. No fixed fee is implied. Production served Polygon and Base
 (splitter v1.4) at the 2026-10-04 baseline check. Additional client descriptors
 do not prove production activation; check issuer capabilities and merchant
-authorization. This cohort does not add a Solana payment executor. The smallest batch is
-$0.10 plus gas.
+authorization. This source cohort adds a Solana v1.4 adapter with explicit
+network, asset and fee/rent limits; current published Solana deployment records
+remain disabled. The smallest paid batch is $0.10, plus network fees and any
+required account rent.
 
 (The older "98.99 / 1 / 0.01" figure was the v1.2 fee-on-top model.)
 
