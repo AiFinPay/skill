@@ -9,8 +9,10 @@ any client that loads `SKILL.md`).
 | `aifinpay` | Paying — agent buys x402-gated API access | `agent/skills/aifinpay/SKILL.md` |
 | `aifinpay-merchant` | Earning — merchant charges agents per request | `agent/skills/aifinpay-merchant/SKILL.md` |
 
-Version2.7.0 describes the coordinated MCP2.6.0 / Node and Python SDK2.4.0
-release target. Its nine EVM descriptors require explicit owner and merchant
+Version2.8.0 describes the coordinated MCP2.7.0 / Node and Python SDK2.5.0
+release target, including the Solana source adapter. Canonical disabled Solana
+records remain unavailable until accepted and served. Its nine EVM descriptors
+require explicit owner and merchant
 network consent plus backend readiness; installing instructions does not
 activate networks. Historical published baselines are dated in the payer
 guide and do not claim the target packages have already been published.

@@ -4,7 +4,7 @@ description: Configure an HTTP 402 gate for agent access to a website or API,
   with owner-selected routes, verified payouts and explicitly accepted EVM
   networks. Agents settle from their own wallets; the merchant receives 99%.
 license: MIT
-version: 2.7.0
+version: 2.8.0
 author: AiFinPay Support
 metadata:
   hermes:
@@ -155,11 +155,20 @@ Gate 0.3.3 source adds `instructions_url` (payer skill),
 links to maintained public instructions, not stored wallet or receipt data.
 Existing sites must upgrade/redeploy gate to emit those new fields.
 
-This skill's release target is MCP2.6.0 and Node/Python SDK2.4.0. Those clients
+This skill's release target is MCP2.7.0 and Node/Python SDK2.5.0. Those clients
 reuse the signed v1.4 payment kernel for nine EVM network descriptors; network
 metadata does not activate a deployment or verifier. Production served Polygon
 and Base at the 2026-10-04 baseline check. Additional networks require a ready
 backend, pinned deployment/token metadata, a verifier and merchant consent.
+
+The Solana adapter is a source capability in this target. Current
+`deployments1.1.3` Solana records remain disabled. A Solana merchant needs an
+explicit accepted network and verified Solana payout, an accepted program/IDL
+and mint inventory, configured signer/RPC, finalized value verification and
+funded end-to-end acceptance before payments are advertised. Native SOL and
+classic SPL use exact lamport/token units; a balance or program address does
+not establish payment readiness. Do not substitute historical Seat/receipt
+flows for the v1.4 paid-access route.
 
 Agents using MCP `payable_fetch`, Node `fetchPaid` or Python `fetch_paid` pay
 merchants registered for `settlement_version: "1.4"` on an explicitly accepted
