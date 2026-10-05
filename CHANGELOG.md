@@ -1,3 +1,12 @@
+## 2.8.0 — source candidate
+
+- Describe the MCP2.7 / Node and Python2.5 Solana source target with explicit
+  owner environment/network, local Ed25519 identity and lamport fee/rent cap.
+- Keep current disabled Solana deployment, governance and paid-acceptance
+  gates explicit; no publication or activation claim.
+- Explain native/classic SPL exact units, persistent prepare/recovery and
+  case-sensitive payer/program/mint bindings without a replacement payment.
+
 ## 2.7.0 — release candidate
 
 - Describe the coordinated MCP2.6.0 / Node and Python SDK2.4.0 target without
