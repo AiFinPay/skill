@@ -1,11 +1,10 @@
 ---
 name: aifinpay-merchant
-description: Turn any website or API into one that charges AI agents to access
-  it. Agents scrape you for free today; with one middleware they pay per request
-  in stablecoins or native tokens on Polygon and Solana. Non-custodial — you
-  keep 99%.
+description: Configure an HTTP 402 gate for agent access to a website or API,
+  with owner-selected routes, verified payouts and explicitly accepted EVM
+  networks. Agents settle from their own wallets; the merchant receives 99%.
 license: MIT
-version: 2.4.0
+version: 2.7.0
 author: AiFinPay Support
 metadata:
   hermes:
@@ -156,10 +155,19 @@ Gate 0.3.3 source adds `instructions_url` (payer skill),
 links to maintained public instructions, not stored wallet or receipt data.
 Existing sites must upgrade/redeploy gate to emit those new fields.
 
-Agents using MCP `payable_fetch` or Node `fetchPaid` pay merchants registered
-for `settlement_version: "1.4"` on Polygon. Existing merchants keep their prior
-version until their owner updates it at registration or in the dashboard. Do not change the payout wallet
-or claim compatibility merely because discovery returns 200.
+This skill's release target is MCP2.6.0 and Node/Python SDK2.4.0. Those clients
+reuse the signed v1.4 payment kernel for nine EVM network descriptors; network
+metadata does not activate a deployment or verifier. Production served Polygon
+and Base at the 2026-10-04 baseline check. Additional networks require a ready
+backend, pinned deployment/token metadata, a verifier and merchant consent.
+
+Agents using MCP `payable_fetch`, Node `fetchPaid` or Python `fetch_paid` pay
+merchants registered for `settlement_version: "1.4"` on an explicitly accepted
+and served network. Existing merchants keep their prior version and default
+network until their owner updates them. Read the selected issuer's
+`/api/payment-capabilities`; discovery returning 200 alone does not establish
+payment readiness. Do not change a payout wallet, accepted network set or
+settlement version without the merchant owner's authorization.
 
 ## Register the site (get your merchant_id)
 
@@ -183,9 +191,15 @@ The gate needs a `merchant_id`. Two ways to get one:
    `{"name", "pay_to": {"evm": "0x…"}, "settlement_version": "1.4"}` returns the
    id and a `merchant_secret` shown once. Claim the merchant in the dashboard
    with that secret, or it belongs to no account. Send ONE `pay_to.evm` — it
-   receives on every EVM chain; per-chain keys such as `base` are refused. Agents
-   pay on Polygon unless the merchant adds `"settlement_chain": "base"`; then
-   quotes, and so payments, are on Base (ETH or USDC) to the same address. To
+   is the EVM-family payout; per-chain keys such as `base` are refused. An EVM
+   address does not opt the merchant into every network. `settlement_chain`
+   remains the merchant's default (`polygon` unless configured otherwise).
+   Updated backends accept an explicit `settlement_chains` list, for example
+   `["polygon", "base"]`, with the default included. An agent's optional
+   quote `settlement_chain` is accepted only when it is in that merchant list,
+   has a verified payout and is served for the request's mode. Omitting it
+   preserves the merchant default. Never broaden consent just because two
+   networks share the same EVM address. To
    move the payout later, `PATCH /v1/merchants/{id}` with header
    `AIFP-Merchant-Secret` and `{"pay_to": {"evm": "0x…"}}`.
 
@@ -194,6 +208,7 @@ The gate needs a `merchant_id`. Two ways to get one:
 | decision | why it matters |
 |---|---|
 | **payout wallet** | where the 99% lands. EVM address (same on every EVM chain) and/or a Solana address. Set in the dashboard. |
+| **accepted payment networks** | an explicit set plus a default; the backend intersects it with verified payouts and served deployments. A wallet address alone does not grant network consent. |
 | **which routes cost money** | gate the agent/data endpoints; leave human pages open. The gate only challenges agent-shaped requests, so humans are never blocked. |
 | **price per route** | a `tier` (standard / complex / premium) sets the per-request price. Change it in the dashboard without redeploying. |
 

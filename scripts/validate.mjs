@@ -4,6 +4,7 @@ import { join } from "node:path";
 const root = new URL("..", import.meta.url).pathname;
 const skillsRoot = join(root, "agent", "skills");
 const skills = ["aifinpay", "aifinpay-merchant"];
+const version = JSON.parse(readFileSync(join(root, "package.json"), "utf8")).version;
 let failed = false;
 
 for (const name of skills) {
@@ -33,6 +34,18 @@ for (const name of skills) {
     console.error(`FAIL: ${name}: frontmatter name is "${declared}"`);
     failed = true;
   }
+  const skillVersion = m[1].match(/^version:\s*(\S+)$/m)?.[1];
+  if (skillVersion !== version) {
+    console.error(`FAIL: ${name}: frontmatter version ${skillVersion} differs from package ${version}`);
+    failed = true;
+  }
+  if (name === "aifinpay") {
+    const targets = [...text.matchAll(/^Release target: MCP \*\*(\d+\.\d+\.\d+)\*\*, Node SDK \*\*(\d+\.\d+\.\d+)\*\*, Python \*\*(\d+\.\d+\.\d+)\*\*\.$/gm)];
+    if (targets.length !== 1 || text.includes("Released and current:")) {
+      console.error("FAIL: payer guide requires one explicit cohort target and truthful dated publication baselines");
+      failed = true;
+    }
+  }
   if (text.includes("aifinpay.company") && !text.includes("retired")) {
     console.error(`FAIL: ${name}: references retired domain without noting retirement`);
     failed = true;
@@ -42,7 +55,11 @@ for (const name of skills) {
 
 // The Claude Code plugin manifests ship in the npm tarball and are what the
 // marketplace install reads. They said 2.1.0 while npm served 2.4.0.
-const version = JSON.parse(readFileSync(join(root, "package.json"), "utf8")).version;
+const lock = JSON.parse(readFileSync(join(root, "package-lock.json"), "utf8"));
+if (lock.version !== version || lock.packages?.[""]?.version !== version) {
+  console.error("FAIL: package-lock root versions differ from package.json");
+  failed = true;
+}
 const plugin = JSON.parse(readFileSync(join(root, ".claude-plugin", "plugin.json"), "utf8"));
 const marketplace = JSON.parse(readFileSync(join(root, ".claude-plugin", "marketplace.json"), "utf8"));
 for (const [where, declared] of [

@@ -1,4 +1,20 @@
-## 2.6.0 — unreleased
+## 2.7.0 — release candidate
+
+- Describe the coordinated MCP2.6.0 / Node and Python SDK2.4.0 target without
+  claiming publication or production activation; preserve dated baseline facts.
+- List the nine owner-selectable EVM descriptors, exact pinned stablecoins,
+  6/18-decimal token units and selected native gas currency. Explain OP extra
+  costs and Nitro's already-inclusive estimate.
+- Require explicit merchant accepted networks, verified payout and backend
+  readiness; a shared EVM address is not network consent. No non-EVM executor
+  or BOT-to-Robinhood alias is implied.
+- Explain non-expiring unknown reservations, once-only recovery, original
+  signed-byte network binding, local-process shared budget storage and safe
+  reconciliation before downgrade.
+- Correct the moved canonical `agent/skills/` paths and coordinate the MCP
+  bundle's exact release-target/content guard with the canonical package.
+
+## 2.6.0
 
 - Payer skill: Base. MCP 2.5 pays on the chain the owner sets in
   `AIFINPAY_PAY_CHAIN` (`polygon` default, or `base`), with the gas cap in ETH

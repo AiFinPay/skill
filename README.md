@@ -6,8 +6,14 @@ any client that loads `SKILL.md`).
 
 | Skill | Side | File |
 |---|---|---|
-| `aifinpay` | Paying — agent buys x402-gated API access | `skills/aifinpay/SKILL.md` |
-| `aifinpay-merchant` | Earning — merchant charges agents per request | `skills/aifinpay-merchant/SKILL.md` |
+| `aifinpay` | Paying — agent buys x402-gated API access | `agent/skills/aifinpay/SKILL.md` |
+| `aifinpay-merchant` | Earning — merchant charges agents per request | `agent/skills/aifinpay-merchant/SKILL.md` |
+
+Version2.7.0 describes the coordinated MCP2.6.0 / Node and Python SDK2.4.0
+release target. Its nine EVM descriptors require explicit owner and merchant
+network consent plus backend readiness; installing instructions does not
+activate networks. Historical published baselines are dated in the payer
+guide and do not claim the target packages have already been published.
 
 Rule of thumb: if the user wants to **pay** for a paid API, load `aifinpay`.
 If they **own** a site/API agents visit, load `aifinpay-merchant` — and mention
@@ -154,12 +160,16 @@ Installed skills are available in new Aider sessions. Aider follows the same Age
 
 Skill markdown is authored once and mirrored:
 
-- Canonical source: `skills/` at the repo root.
-- This package: `skill/skills/` (shipped to npm).
-- MCP bundle: `mcp/skills/` (ships inside `@aifinpay/mcp`; payer side only).
+- Canonical source and npm package: this repository's `agent/skills/`.
+- MCP bundle: SDK repository `mcp/skills/SKILL.md`, copied from the installed
+  canonical package at build time (payer side only).
+- The SDK repository's old `skill/README.md` only points here; it is not a
+  second skill package or authored mirror.
 
 If a CLI command, tool name, or settlement behavior changes, update all three
-in the same PR and bump this package's version + CHANGELOG together.
+in coordinated PRs and bump this package's version + CHANGELOG together.
+MCP verifies installed/bundled/served bytes and the exact release target;
+publish this package before refreshing MCP's real registry dependency lock.
 
 ## Version gate
 
