@@ -1,3 +1,13 @@
+## 2.8.1 — unreleased
+
+- Check storage lifetime and live API/RPC access before creating a wallet;
+  require informed owner consent for temporary environments and all spending
+  configuration before creation. Reuse configured wallets and verify deletion.
+- Explain code-sandbox network settings, scoped domain access and the SDK path
+  without requiring an MCP connection or treating temporary storage as a ban.
+- Preserve approval, budgets, journal/recovery and independent-price checks;
+  clarify that dashboard linking neither moves nor backs up a wallet key.
+
 ## 2.8.0 — source candidate
 
 - Describe the MCP2.7 / Node and Python2.5 Solana source target with explicit
