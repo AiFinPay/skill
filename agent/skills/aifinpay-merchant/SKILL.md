@@ -221,8 +221,9 @@ Retries retain the same event IDs, timestamps and facts; outages, overflow
 and crashes lose observations. Permanent errors and redirects are not retried;
 fix credentials/configuration before replacing a stopped producer.
 
-Health auto-samples every 60 seconds and all attempts are at least 5 seconds
-apart. A health acknowledgement is exactly `{version: 2, duplicate: boolean}`,
+Node health auto-samples every 60 seconds; Python normally samples every 5
+seconds. All health attempts are at least 5 seconds apart, and retries may
+delay samples. A health acknowledgement is exactly `{version: 2, duplicate: boolean}`,
 separate from the event-batch acknowledgement. Until a sample is acknowledged,
 remote pending/drop coverage is unknown; a health gap over 5 minutes remains
 a coverage gap. Local counters and successful HTTP responses do not prove a
