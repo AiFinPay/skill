@@ -5,7 +5,9 @@ const git = (args) => execFileSync("git", args, { encoding: "utf8" }).trim();
 const baseRef = process.argv[2] || "origin/main";
 // Unlike a missing-base skip, a history/configuration failure is a failed gate.
 const base = git(["merge-base", "HEAD", baseRef]);
-const changed = git(["diff", "--name-only", base, "HEAD"]).split("\n");
+// Include pending candidate edits as well as committed changes. CI's clean
+// checkout is identical; a local precommit check must not silently pass no diff.
+const changed = git(["diff", "--name-only", base]).split("\n");
 const published = /^(agent\/|\.claude-plugin\/|package\.json$|README\.md$|LICENSE$|CHANGELOG\.md$)/;
 if (changed.some((path) => published.test(path))) {
   const before = JSON.parse(git(["show", `${base}:package.json`])).version;

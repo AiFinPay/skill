@@ -1,3 +1,18 @@
+## 2.9.0 — reporting cohort source candidate
+
+- Align package, lock, plugin and both skill versions with the coordinated
+  MCP2.8.0 / Node SDK2.6.0 / Python SDK2.5.1 release target; preserve dated
+  published baselines without claiming this cohort is published or active.
+- Describe the explicit merchant reporting v2 target for Node gate0.4.0 and
+  Python gate0.1.3: observed challenge/admission/completion, consent and
+  memory-only capabilities, bounded queue loss and acknowledged producer health.
+  Observations do not establish verified identity, payment or complete coverage.
+- Keep the existing gated MCP tools, signing, receipt/budget/recovery and
+  network activation requirements. Canonical payer bytes must be copied into
+  the paired MCP build before its exact cohort and registry release gates.
+- Validate matching payer/merchant/README targets, dated payer publication
+  baseline and changelog metadata; test drift refusals without dependencies.
+
 ## 2.8.0 — source candidate
 
 - Describe the MCP2.7 / Node and Python2.5 Solana source target with explicit

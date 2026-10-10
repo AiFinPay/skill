@@ -9,8 +9,13 @@ any client that loads `SKILL.md`).
 | `aifinpay` | Paying — agent buys x402-gated API access | `agent/skills/aifinpay/SKILL.md` |
 | `aifinpay-merchant` | Earning — merchant charges agents per request | `agent/skills/aifinpay-merchant/SKILL.md` |
 
-Version2.8.0 describes the coordinated MCP2.7.0 / Node and Python SDK2.5.0
-release target, including the Solana source adapter. Canonical disabled Solana
+Version **2.9.0** describes a coordinated reporting release target.
+Release target: MCP **2.8.0**, Node SDK **2.6.0**, Python **2.5.1**.
+Reporting release target: Node gate **0.4.0**, Python gate **0.1.3**.
+The merchant guide describes explicit opt-in observations, consent, queue loss
+and producer health using the SDK's reporting v2 contract. It adds no MCP tools
+or signing authority and does not establish publication or partner rollout.
+The payer guide retains the Solana source adapter. Canonical disabled Solana
 records remain unavailable until accepted and served. Its nine EVM descriptors
 require explicit owner and merchant
 network consent plus backend readiness; installing instructions does not
@@ -20,6 +25,13 @@ guide and do not claim the target packages have already been published.
 Rule of thumb: if the user wants to **pay** for a paid API, load `aifinpay`.
 If they **own** a site/API agents visit, load `aifinpay-merchant` — and mention
 the other side exists.
+
+For merchant reporting, follow the merchant guide's optional reporting section
+and the SDK's [Node](https://github.com/AiFinPay/sdk/blob/main/gate/REPORTING-V2.md)
+or [Python](https://github.com/AiFinPay/sdk/blob/main/python-gate/REPORTING-V2.md)
+instructions. Observation events, admission and resource completion are
+distinct; payments require confirmed settlement evidence. Producer health
+and pending/drop coverage describe telemetry completeness, not payment success.
 
 ## Install
 

@@ -6,6 +6,29 @@ const skillsRoot = join(root, "agent", "skills");
 const skills = ["aifinpay", "aifinpay-merchant"];
 const version = JSON.parse(readFileSync(join(root, "package.json"), "utf8")).version;
 let failed = false;
+const targetsBySurface = new Map();
+const targetPattern = /^Release target: MCP \*\*(\d+\.\d+\.\d+)\*\*, Node SDK \*\*(\d+\.\d+\.\d+)\*\*, Python \*\*(\d+\.\d+\.\d+)\*\*\.$/gm;
+const reportingTargetPattern = /^Reporting release target: Node gate \*\*(\d+\.\d+\.\d+)\*\*, Python gate \*\*(\d+\.\d+\.\d+)\*\*\.$/gm;
+const reportingTargetsBySurface = new Map();
+
+function checkTargets(name, text) {
+  const targets = [...text.matchAll(targetPattern)];
+  if (targets.length !== 1 || text.includes("Released and current:")) {
+    console.error(`FAIL: ${name}: requires one explicit cohort release target, not a current-release claim`);
+    failed = true;
+  } else {
+    targetsBySurface.set(name, targets[0].slice(1).join("/"));
+  }
+  if (name !== "aifinpay") {
+    const reportingTargets = [...text.matchAll(reportingTargetPattern)];
+    if (reportingTargets.length !== 1) {
+      console.error(`FAIL: ${name}: requires one explicit reporting gate release target`);
+      failed = true;
+    } else {
+      reportingTargetsBySurface.set(name, reportingTargets[0].slice(1).join("/"));
+    }
+  }
+}
 
 for (const name of skills) {
   const path = join(skillsRoot, name, "SKILL.md");
@@ -39,10 +62,10 @@ for (const name of skills) {
     console.error(`FAIL: ${name}: frontmatter version ${skillVersion} differs from package ${version}`);
     failed = true;
   }
+  checkTargets(name, text);
   if (name === "aifinpay") {
-    const targets = [...text.matchAll(/^Release target: MCP \*\*(\d+\.\d+\.\d+)\*\*, Node SDK \*\*(\d+\.\d+\.\d+)\*\*, Python \*\*(\d+\.\d+\.\d+)\*\*\.$/gm)];
-    if (targets.length !== 1 || text.includes("Released and current:")) {
-      console.error("FAIL: payer guide requires one explicit cohort target and truthful dated publication baselines");
+    if (!/^Published baseline checked \d{4}-\d{2}-\d{2}: MCP \*\*\d+\.\d+\.\d+\*\*, Node SDK \*\*\d+\.\d+\.\d+\*\*\.$/m.test(text)) {
+      console.error("FAIL: payer guide requires a dated publication baseline");
       failed = true;
     }
   }
@@ -51,6 +74,21 @@ for (const name of skills) {
     failed = true;
   }
   console.log(`ok: ${name} (${text.length} chars)`);
+}
+
+checkTargets("README.md", readFileSync(join(root, "README.md"), "utf8"));
+if (new Set(targetsBySurface.values()).size > 1) {
+  console.error("FAIL: payer, merchant and README cohort targets differ");
+  failed = true;
+}
+if (new Set(reportingTargetsBySurface.values()).size > 1) {
+  console.error("FAIL: merchant and README reporting gate targets differ");
+  failed = true;
+}
+const changelog = readFileSync(join(root, "CHANGELOG.md"), "utf8");
+if (!changelog.startsWith(`## ${version} — `)) {
+  console.error("FAIL: changelog must label the package version in its first release entry");
+  failed = true;
 }
 
 // The Claude Code plugin manifests ship in the npm tarball and are what the
