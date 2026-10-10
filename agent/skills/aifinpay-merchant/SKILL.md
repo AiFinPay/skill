@@ -4,7 +4,7 @@ description: Configure an HTTP 402 gate for agent access to a website or API,
   with owner-selected routes, verified payouts and explicitly accepted EVM
   networks. Agents settle from their own wallets; the merchant receives 99%.
 license: MIT
-version: 2.8.0
+version: 2.9.0
 author: AiFinPay Support
 metadata:
   hermes:
@@ -155,7 +155,9 @@ Gate 0.3.3 source adds `instructions_url` (payer skill),
 links to maintained public instructions, not stored wallet or receipt data.
 Existing sites must upgrade/redeploy gate to emit those new fields.
 
-This skill's release target is MCP2.7.0 and Node/Python SDK2.5.0. Those clients
+Release target: MCP **2.8.0**, Node SDK **2.6.0**, Python **2.5.1**.
+This coordinated target does not establish publication or reporting rollout.
+Those clients
 reuse the signed v1.4 payment kernel for nine EVM network descriptors; network
 metadata does not activate a deployment or verifier. Production served Polygon
 and Base at the 2026-10-04 baseline check. Additional networks require a ready
@@ -177,6 +179,61 @@ network until their owner updates them. Read the selected issuer's
 `/api/payment-capabilities`; discovery returning 200 alone does not establish
 payment readiness. Do not change a payout wallet, accepted network set or
 settlement version without the merchant owner's authorization.
+
+## Optional observation and reporting
+
+Reporting release target: Node gate **0.4.0**, Python gate **0.1.3**.
+Use these instructions only after checking the installed packages and the
+backend's reporting v2 readiness. Installing the skill does not enable reporting
+or verify a partner integration. Opt in when the merchant owner requests it:
+Node uses `createGateReporterV2` with `reporting: { version: 2, reporter,
+context }`; Python uses `GateReporterV2` with `Gate(..., reporting=reporter,
+reporting_context=...)`. Keep the existing receipt verification and shared
+quota store. Use one producer per merchant per worker, created after fork in
+Python; do not also attach the legacy `onEvent`/`on_event` reporter or report
+the same request through both hosted and self-hosted instrumentation.
+
+Declare only stages the adapter actually observes: `access_challenged` for an
+emitted 402, `access_admitted` before the paid handler, and
+`resource_response_completed` for its terminal success, redirect, error or
+abort. A challenge is not a browser view; admission is not completion.
+Neither stage counts a verified unique agent or proves payment. Payments and
+revenue require confirmed settlement evidence, never purchased quota or
+invented historical usage. Browser observations need their separate API;
+the gate producer does not infer them from User-Agent or `AIFP-Agent-Id`.
+
+Context carries an explicit channel and consent state. Only granted consent
+allows an optional random, site-scoped `client_id`; it remains unverified.
+Do not derive identity from a wallet, IP, fingerprint, headers or request body.
+An optional flow minted by `mintFlow`/`mint_flow` carries a short-lived
+`reporting_token` for observation only. It grants no access, payment authority,
+ownership or integration verification. Keep it in memory, outside URLs,
+logs, browser storage, cookies and payment/recovery files. The payer SDK's
+optional `reportingToken`/`reporting_token` reaches only its fixed first-party
+quote endpoints; never manually forward it to merchant, pay, RPC or JWKS
+requests. Reporting failures preserve the original access/payment result.
+
+Keep the merchant secret server-side. Report only registered route patterns,
+never full URLs, queries, bodies, raw headers, IPs, receipt JWTs or wallet IDs.
+Queues are in memory, bounded to 1000 events, with batches of at most 50,
+3-second request deadlines and at most 5 attempts within 15 minutes.
+Retries retain the same event IDs, timestamps and facts; outages, overflow
+and crashes lose observations. Permanent errors and redirects are not retried;
+fix credentials/configuration before replacing a stopped producer.
+
+Health auto-samples every 60 seconds and all attempts are at least 5 seconds
+apart. A health acknowledgement is exactly `{version: 2, duplicate: boolean}`,
+separate from the event-batch acknowledgement. Until a sample is acknowledged,
+remote pending/drop coverage is unknown; a health gap over 5 minutes remains
+a coverage gap. Local counters and successful HTTP responses do not prove a
+complete report, and superseding lifetime health counters must not be summed.
+Drain HTTP requests before closing the producer in the existing shutdown hook;
+flush/close do not promise delivery.
+
+Read the exact wiring and consent/loss rules before implementation:
+[Node reporting v2](https://github.com/AiFinPay/sdk/blob/main/gate/REPORTING-V2.md)
+and [Python reporting v2](https://github.com/AiFinPay/sdk/blob/main/python-gate/REPORTING-V2.md).
+This reporting target adds no MCP tools or signing authority.
 
 ## Register the site (get your merchant_id)
 
