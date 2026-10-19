@@ -9,8 +9,8 @@ any client that loads `SKILL.md`).
 | `aifinpay` | Paying — agent buys x402-gated API access | `agent/skills/aifinpay/SKILL.md` |
 | `aifinpay-merchant` | Earning — merchant charges agents per request | `agent/skills/aifinpay-merchant/SKILL.md` |
 
-Version **2.9.0** describes a coordinated reporting release target.
-Release target: MCP **2.8.0**, Node SDK **2.6.0**, Python **2.5.1**.
+Version **2.10.0** describes the first-payment path for a fresh agent.
+Release target: MCP **2.11.0**, Node SDK **2.8.0**, Python **2.7.0**.
 Reporting release target: Node gate **0.4.0**, Python gate **0.1.3**.
 The merchant guide describes explicit opt-in observations, consent, queue loss
 and producer health using the SDK's reporting v2 contract. It adds no MCP tools
