@@ -4,7 +4,7 @@ description: Configure an HTTP 402 gate for agent access to a website or API,
   with owner-selected routes, verified payouts and explicitly accepted EVM
   networks. Agents settle from their own wallets; the merchant receives 99%.
 license: MIT
-version: 2.10.1
+version: 2.10.2
 author: AiFinPay Support
 metadata:
   hermes:
@@ -155,7 +155,7 @@ Gate 0.3.3 source adds `instructions_url` (payer skill),
 links to maintained public instructions, not stored wallet or receipt data.
 Existing sites must upgrade/redeploy gate to emit those new fields.
 
-Release target: MCP **2.11.1**, Node SDK **2.8.0**, Python **2.7.0**.
+Release target: MCP **2.11.3**, Node SDK **2.9.0**, Python **2.7.0**.
 This coordinated target does not establish publication or reporting rollout.
 Those clients
 reuse the signed v1.4 payment kernel for nine EVM network descriptors; network
