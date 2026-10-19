@@ -1,3 +1,16 @@
+## 2.10.0 — first payment in five steps
+
+- Payer guide: a fresh install reaches its first payment in five steps —
+  402 → `payment_setup_status` → `npx @aifinpay/mcp init` (no terminal
+  needed) → owner funds and enables → `payable_fetch`. "Buy access for this
+  site" checks readiness through `payment_setup_status` instead of looking
+  for `payable_fetch` in the tool list.
+- Payer guide: `payable_fetch` is always listed on MCP 2.11.0 and answers
+  with the setup checklist until the owner has enabled payments; a v1.3
+  route that is not live does not mean the network is disabled.
+- Release target MCP 2.11.0 / Node SDK 2.8.0 / Python 2.7.0; published
+  baseline checked 2026-10-19 (MCP 2.10.0, Node SDK 2.8.0).
+
 ## 2.9.0 — reporting cohort source candidate
 
 - Align package, lock, plugin and both skill versions with the coordinated
