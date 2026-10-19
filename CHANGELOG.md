@@ -1,3 +1,21 @@
+## 2.10.2 — funding at today's rate, working limits in the dashboard
+
+- Payer guide: step 4 no longer names a POL amount or a POL/USD rate. The
+  amount to fund is what `payment_setup_status` prices in `funding` (MCP
+  2.11.3): the smallest batch at today's rate plus the gas cap. When no rate
+  can be read, the agent asks the owner for "the batch price in POL at
+  today's rate plus the gas cap" and names no number. On 2026-10-19 one
+  `$0.10` batch was 1.08 POL while the guide still said 0.5.
+- Payer guide: the env USD values are a ceiling the owner sets once (the
+  example block shows `5` and `20` and says they are not a budget); the
+  working limits — per-payment cap, daily cap, pause, allowed sites — are the
+  dashboard Controls once the agent is claimed with `agent_claim_self`,
+  enforced by the backend on every quote and payment. The "link it to the
+  owner's dashboard" section says so instead of telling the agent to keep the
+  limits in its configuration.
+- Release target MCP 2.11.3 / Node SDK 2.9.0; published baseline checked
+  2026-10-19 (MCP 2.11.2, Node SDK 2.8.0).
+
 ## 2.10.1 — restart after env changes, AIFINPAY_HOME on init
 
 - Payer guide: owner limits are read when the MCP server starts, so after the
