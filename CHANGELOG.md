@@ -1,3 +1,16 @@
+## 2.10.1 — restart after env changes, AIFINPAY_HOME on init
+
+- Payer guide: owner limits are read when the MCP server starts, so after the
+  env changes the client must restart the `aifinpay` server; `agent_reload`
+  re-reads only the keystore. Until the restart `payment_setup_status`
+  reports `payments_enabled: false`, which the agent reports as expected and
+  waits on instead of treating as a refusal.
+- Payer guide: step 3 runs the init command exactly as `next_step` gives it,
+  keeping the `AIFINPAY_HOME=…` prefix for a server with its own wallet
+  directory, and never replaces a keystore it cannot open.
+- Release target MCP 2.11.1; published baseline checked 2026-10-19
+  (MCP 2.11.0, Node SDK 2.8.0).
+
 ## 2.10.0 — first payment in five steps
 
 - Payer guide: a fresh install reaches its first payment in five steps —
