@@ -1,3 +1,23 @@
+## 2.11.0 — payments on by default, init → fund → link → pay
+
+- Payer guide: MCP 2.12.1 pays by default from a persistent wallet within a
+  built-in ceiling of $5 per payment and $20 per rolling 24 hours; nobody
+  edits the MCP client config to enable payments. The first-payment steps
+  are init (with `agent_reload` in the same connection, no restart) → fund →
+  link (`agent_claim_self`) → pay. `AIFINPAY_PAYMENTS_ENABLED=0` is the off
+  switch; `AIFINPAY_MAX_USD` / `AIFINPAY_DAILY_USD` can only lower the
+  ceiling (a higher value stops the server at start), and they,
+  `AIFINPAY_GATEWAY_ORIGINS` and the gas cap are optional overrides the agent
+  never asks the owner to add. `payment_setup_status` returns `dashboard`:
+  the owner's Controls, read with the agent's own signature.
+- "Buy access for this site": without an owner allowlist, MCP 2.12.1 pays
+  only a merchant that verified that very site with AiFinPay (the hosted
+  gateway: verified merchants); no environment block is needed. A refusal
+  ("has not verified its site", "is verified for X, not Y") paid nothing; the
+  agent tells the owner and stops. With an allowlist, an unlisted origin is
+  refused by name and only the owner adds it.
+- Release target: MCP 2.12.1, Node SDK 2.9.0, Python 2.7.1.
+
 ## 2.10.2 — funding at today's rate, working limits in the dashboard
 
 - Payer guide: step 4 no longer names a POL amount or a POL/USD rate. The
