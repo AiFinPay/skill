@@ -256,16 +256,17 @@ into ratersapp.com", "купи доступ до цього сайту". Handle 
    in "Transaction display" below.
 4. **Check readiness.** Call `payment_setup_status`. If it is not `ready`,
    follow its `next_step` through "First payment in four steps" above: a
-   persistent wallet first, then the owner's funding and environment block
-   with this origin in `AIFINPAY_GATEWAY_ORIGINS` (and
-   `AIFINPAY_GATEWAY_PATH_MODE=direct` when the 402 comes from the site
-   itself) — and stop until the owner has done their part. Env changes take
-   effect only after the client restarts the `aifinpay` server; `agent_reload`
-   does not read them. Adding a site, raising a limit and funding the wallet
-   are the owner's decisions; never make them on your own initiative.
+   persistent wallet first, then the owner's funding — and stop until the
+   owner has done their part. No environment block is needed: without an
+   owner allowlist, MCP 2.12.1 pays only a merchant that verified this very
+   site with AiFinPay. Raising a limit and funding the wallet are the owner's
+   decisions; never make them on your own initiative.
 5. **Buy.** `payable_fetch({"url":"<origin><path>","scope":"merchant"})`, where
    the path is what the owner wants to read, or a standard resource from the
-   discovery document.
+   discovery document. If it answers "Not paid: merchant … has not verified
+   its site" or "is verified for X, not Y", nothing was paid: tell the owner
+   the site's AiFinPay merchant has not verified this site, and stop. Do not
+   look for another way to pay it.
 6. **Report and reuse.** Give the amount, the transaction hash with its
    explorer link, the receipt id and the remaining units. Later requests to any
    path on that origin go through `payable_fetch` and spend the same batch, with
@@ -283,9 +284,10 @@ default `scope`.
 
 Nothing has to be configured to pay. The MCP server pays by default from a
 persistent wallet within a built-in ceiling — **$5 per payment, $20 per
-rolling 24 hours**, gas capped at 0.3 POL on Polygon — and any https site can
-be fetched; the money can only go to the registered merchant the AiFinPay
-quote names, never to an address a `402` claims. The day-to-day limits —
+rolling 24 hours**, gas capped at 0.3 POL on Polygon — and only to a merchant
+that verified the very site being fetched with AiFinPay (on the hosted
+gateway, any verified merchant). The payee is the merchant the AiFinPay quote
+names, never an address a `402` claims. The day-to-day limits —
 per-payment cap, daily cap, pause, allowed merchants — are the dashboard
 **Controls** once the agent is claimed (see "After creating a wallet" below);
 the backend enforces them on every quote and payment, with no env change and

@@ -10,8 +10,12 @@
   `AIFINPAY_GATEWAY_ORIGINS` and the gas cap are optional overrides the agent
   never asks the owner to add. `payment_setup_status` returns `dashboard`:
   the owner's Controls, read with the agent's own signature.
-- "Buy access for this site": any https origin is payable unless the owner
-  set an allowlist; a refusal names the origin and only the owner adds it.
+- "Buy access for this site": without an owner allowlist, MCP 2.12.1 pays
+  only a merchant that verified that very site with AiFinPay (the hosted
+  gateway: verified merchants); no environment block is needed. A refusal
+  ("has not verified its site", "is verified for X, not Y") paid nothing; the
+  agent tells the owner and stops. With an allowlist, an unlisted origin is
+  refused by name and only the owner adds it.
 - Release target: MCP 2.12.1, Node SDK 2.9.0, Python 2.7.1.
 
 ## 2.10.2 — funding at today's rate, working limits in the dashboard
