@@ -1,3 +1,17 @@
+## 2.11.1 — merchant guide: verify the domain
+
+- Merchant guide: the list of what MCP `payable_fetch` needs from a merchant
+  now includes a verified site. Since MCP 2.12.1, without an owner allowlist
+  it pays only a merchant whose public record has `site_verified: true`, and
+  for a self-hosted gate only when the fetched host equals the `site_url`
+  host; on the hosted gateway verification alone is checked.
+- Merchant guide: "Register the site" adds the domain step (Site URL plus the
+  `_aifp-verify.<host>` TXT record from the dashboard's DNS connection
+  queue), and "Verify it works" reads `site_verified` from
+  `GET /v1/merchants/{id}`.
+- No change to the payer guide beyond its version line. Release target
+  unchanged: MCP 2.12.1, Node SDK 2.9.0, Python 2.7.1.
+
 ## 2.11.0 — payments on by default, init → fund → link → pay
 
 - Payer guide: MCP 2.12.1 pays by default from a persistent wallet within a

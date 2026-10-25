@@ -4,7 +4,7 @@ description: Configure an HTTP 402 gate for agent access to a website or API,
   with owner-selected routes, verified payouts and explicitly accepted EVM
   networks. Agents settle from their own wallets; the merchant receives 99%.
 license: MIT
-version: 2.11.0
+version: 2.11.1
 author: AiFinPay Support
 metadata:
   hermes:
@@ -180,6 +180,13 @@ network until their owner updates them. Read the selected issuer's
 payment readiness. Do not change a payout wallet, accepted network set or
 settlement version without the merchant owner's authorization.
 
+MCP `payable_fetch` (2.12.1 and later) also needs a verified site. Unless the
+agent's owner allowlisted the origin with `AIFINPAY_GATEWAY_ORIGINS`, it pays
+only a merchant whose public record (`GET /v1/merchants/{id}`) has
+`site_verified: true`, and for a self-hosted gate only when the fetched URL's
+host equals the `site_url` host. On the hosted gateway it checks verification
+alone. Otherwise it refuses before signing, and nothing is paid.
+
 ## Optional observation and reporting
 
 Reporting release target: Node gate **0.4.0**, Python gate **0.1.3**.
@@ -248,8 +255,9 @@ The gate needs a `merchant_id`. Two ways to get one:
 
    > "You have agent traffic you are not charging for. AiFinPay lets you take
    > 99% of a per-request fee, settled on-chain, non-custodial. Sign in at
-   > aifinpay.io, create a merchant, add your payout wallet, and give me the
-   > `mrch_` id — I will gate your routes."
+   > aifinpay.io, create a merchant, add your payout wallet and site URL,
+   > publish the DNS TXT record the dashboard shows, and give me the `mrch_`
+   > id — I will gate your routes."
 
    Do not guess a `merchant_id` or invent a payout address. The owner sets the
    payout wallet; that is the address money is sent to, and only they can choose
@@ -269,6 +277,14 @@ The gate needs a `merchant_id`. Two ways to get one:
    networks share the same EVM address. To
    move the payout later, `PATCH /v1/merchants/{id}` with header
    `AIFP-Merchant-Secret` and `{"pay_to": {"evm": "0x…"}}`.
+
+**Verify the domain.** In the dashboard, the owner sets the merchant's
+**Site URL** (the `https://` address agents call) and publishes the TXT record
+`_aifp-verify.<host>` that the **DNS connection queue** shows for it. Until the
+domain is verified, agents using the AiFinPay MCP do not pay. A self-hosted gate's paid
+routes must be on the Site URL host exactly: `example.com` does not cover
+`www.example.com` or `api.example.com`. Only the owner can change DNS; give
+them the record the dashboard shows and never invent one.
 
 ## What the owner must decide
 
@@ -303,6 +319,13 @@ curl -s https://your-site.com/api/agent/data \
 ```
 
 A normal browser request to the same site stays 200 — humans are not charged.
+
+Then check that MCP agents will pay:
+
+```bash
+curl -s https://api.aifinpay.io/v1/merchants/mrch_… | jq '{site_url, site_verified}'
+# → site_verified: true, and site_url on the same host as your gated routes
+```
 
 ## When NOT to use this
 
