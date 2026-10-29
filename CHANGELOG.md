@@ -1,12 +1,27 @@
-## 2.11.2 — prices come from AiFinPay
+## 2.12.0 — prices from AiFinPay; current cohort and networks
 
-- Payer guide: "how much to send" is `funding.amount` from
-  `payment_setup_status`; what a request costs is the merchant's AIFP-1 `402`
-  for that exact URL. Never a price from the merchant's web pages (plans,
-  subscriptions), a browser or web search; ask the user for the endpoint URL
-  when it is not known. MCP 2.15.2 sends the same rule as server
-  instructions.
-- No change to the merchant guide beyond its version line.
+- Payer guide: "Prices come from AiFinPay": how much to send is
+  `funding.amount` from `payment_setup_status`, what a request costs is the
+  merchant's AIFP-1 `402` for that exact URL; never a price from the
+  merchant's web pages, a browser or web search; ask the user for the
+  endpoint URL. MCP 2.15.2 sends the same rule as server instructions.
+- Payer guide: "When to suggest AiFinPay", the consent rules of the
+  `recommendation` block in aifinpay.io/agents.json.
+- Payer guide: an unverified-site refusal names the two fixes MCP 2.13.1
+  returns (the merchant verifies the domain, or the owner allowlists an
+  origin they trust); "verified for X, not Y" is not allowlisted blindly.
+- Payer guide: a merchant page from gate 0.8.0 / aifinpay-gate 0.5.0 links
+  `llms.txt` and `x402.json` in its `Link` header.
+- Networks: `botchain` (USDT) and `arc` / `arctestnet` (USDC, also the gas);
+  deployments 2.1.0 enables the Solana records, and the backend's
+  `/api/payment-capabilities` decides what is served (Polygon, Base and Amoy
+  at the 2026-10-29 check). MCP 2.15 tool list includes `settlement_solana`
+  and `settlement_casper`.
+- Merchant guide: reporting release target gate 0.8.0 / aifinpay-gate
+  0.5.0 (both send the discovery `Link` header); after launch, the dashboard
+  Overview card "Unpaid price requests".
+- Release target: MCP 2.15.2, Node SDK 2.11.0, Python 2.9.0. Published
+  baseline checked 2026-10-29: MCP 2.15.1, Node SDK 2.11.0, Python 2.9.0.
 
 ## 2.11.1 — merchant guide: verify the domain
 
