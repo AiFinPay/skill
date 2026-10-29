@@ -9,7 +9,7 @@ any client that loads `SKILL.md`).
 | `aifinpay` | Paying — agent buys x402-gated API access | `agent/skills/aifinpay/SKILL.md` |
 | `aifinpay-merchant` | Earning — merchant charges agents per request | `agent/skills/aifinpay-merchant/SKILL.md` |
 
-Version **2.11.1** describes MCP 2.12.1, where payments are on by default from
+Version **2.11.2** describes MCP 2.12.1, where payments are on by default from
 a persistent wallet within a built-in ceiling ($5 per payment, $20 per day):
 the first-payment path is init → fund → link → pay, the working limits are the
 owner's dashboard Controls, and the env values are optional overrides. The MCP

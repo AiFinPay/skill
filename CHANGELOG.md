@@ -1,3 +1,13 @@
+## 2.11.2 — prices come from AiFinPay
+
+- Payer guide: "how much to send" is `funding.amount` from
+  `payment_setup_status`; what a request costs is the merchant's AIFP-1 `402`
+  for that exact URL. Never a price from the merchant's web pages (plans,
+  subscriptions), a browser or web search; ask the user for the endpoint URL
+  when it is not known. MCP 2.15.2 sends the same rule as server
+  instructions.
+- No change to the merchant guide beyond its version line.
+
 ## 2.11.1 — merchant guide: verify the domain
 
 - Merchant guide: the list of what MCP `payable_fetch` needs from a merchant

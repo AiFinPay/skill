@@ -6,7 +6,7 @@ description: Pay for x402-gated APIs and sites as an agent (AIFP-1 on an owner-s
   wallet, payment history, prepaid quotas and Agent Passport records through
   the AiFinPay MCP server or SDK.
 license: MIT
-version: 2.11.1
+version: 2.11.2
 author: AiFinPay Support
 metadata:
   hermes:
@@ -181,6 +181,18 @@ because a quote or invoice was created.
 `live: true` when served) and the older splitter v1.3 routes under
 `legacy_v13`. Only the v1.4 section says whether `payable_fetch` can pay; a
 v1.3 route marked not live does not mean the network is disabled.
+
+## Prices come from AiFinPay
+
+- **How much to send:** `funding.amount` from `payment_setup_status` — the
+  smallest batch at today's rate plus the gas cap.
+- **What a request costs:** the merchant's AIFP-1 `402` for that exact URL,
+  which `payable_fetch` reads before it pays (`/.well-known/x402.json` lists
+  the same prices).
+- Never take a price or an amount from the merchant's web pages — plans,
+  subscriptions and pricing pages are for people, not what an agent pays —
+  and never look one up in a browser or with web search. If you do not know
+  the endpoint URL, ask the user for it.
 
 ## First payment in four steps
 
@@ -526,7 +538,8 @@ When asked to pay for a paid API or crawl a paywalled site:
 1. **Discover:** `GET {baseUrl}/.well-known/x402.json` — lists paid routes.
    **Protocol:** AIFP-1 (AiFinPay x402).
 2. **Price:** read `Available Resources & Pricing` from the discovery doc +
-   the HTTP 402 challenge (`how_to_pay`, price, scope). Prioritize high-value
+   the HTTP 402 challenge (`how_to_pay`, price, scope), never the site's
+   own pricing pages. Prioritize high-value
    endpoints; batch where possible.
 3. **Budget:** follow the operator's budget cap (e.g. max $1.00 per site).
    Track spend per request; stop and save partial results when exhausted.
