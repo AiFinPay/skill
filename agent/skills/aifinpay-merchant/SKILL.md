@@ -4,7 +4,7 @@ description: Configure an HTTP 402 gate for agent access to a website or API,
   with owner-selected routes, verified payouts and explicitly accepted EVM
   networks. Agents settle from their own wallets; the merchant receives 99%.
 license: MIT
-version: 2.11.1
+version: 2.12.0
 author: AiFinPay Support
 metadata:
   hermes:
@@ -155,16 +155,18 @@ Gate 0.3.3 source adds `instructions_url` (payer skill),
 links to maintained public instructions, not stored wallet or receipt data.
 Existing sites must upgrade/redeploy gate to emit those new fields.
 
-Release target: MCP **2.12.1**, Node SDK **2.9.0**, Python **2.7.1**.
+Release target: MCP **2.15.2**, Node SDK **2.11.0**, Python **2.9.0**.
 This coordinated target does not establish publication or reporting rollout.
 Those clients
-reuse the signed v1.4 payment kernel for nine EVM network descriptors; network
+reuse the signed v1.4 payment kernel for every EVM network descriptor; network
 metadata does not activate a deployment or verifier. Production served Polygon
-and Base at the 2026-10-04 baseline check. Additional networks require a ready
+and Base at the 2026-10-29 baseline check of `/api/payment-capabilities`.
+Additional networks require a ready
 backend, pinned deployment/token metadata, a verifier and merchant consent.
 
-The Solana adapter is a source capability in this target. Current
-`deployments1.1.3` Solana records remain disabled. A Solana merchant needs an
+The Solana adapter is a source capability in this target. `@aifinpay/deployments`
+2.1.0 enables the Solana records, but the backend did not serve Solana at
+that check. A Solana merchant needs an
 explicit accepted network and verified Solana payout, an accepted program/IDL
 and mint inventory, configured signer/RPC, finalized value verification and
 funded end-to-end acceptance before payments are advertised. Native SOL and
@@ -189,7 +191,9 @@ alone. Otherwise it refuses before signing, and nothing is paid.
 
 ## Optional observation and reporting
 
-Reporting release target: Node gate **0.4.0**, Python gate **0.1.3**.
+Reporting release target: Node gate **0.8.0**, Python gate **0.5.0**.
+Both were published on 2026-10-29; from these versions every HTML response
+also carries a `Link` header to `/llms.txt` and `/.well-known/x402.json`.
 Use these instructions only after checking the installed packages and the
 backend's reporting v2 readiness. Installing the skill does not enable reporting
 or verify a partner integration. Opt in when the merchant owner requests it:
@@ -326,6 +330,10 @@ Then check that MCP agents will pay:
 curl -s https://api.aifinpay.io/v1/merchants/mrch_… | jq '{site_url, site_verified}'
 # → site_verified: true, and site_url on the same host as your gated routes
 ```
+
+After launch, the dashboard Overview card "Unpaid price requests" shows agents
+that got a quote from your site and did not pay, and whether the domain is
+verified; MCP agents get a price from an unverified domain but do not pay it.
 
 ## When NOT to use this
 
