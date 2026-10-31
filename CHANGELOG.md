@@ -1,3 +1,9 @@
+## 2.12.1 — capability rows without status fields
+
+- Payer guide: `/api/payment-capabilities` lists only networks that take
+  payments, without `payment_supported` or other status fields; a row without
+  `native` is token-only. The dated 2026-10-29 network snapshot is removed.
+
 ## 2.12.0 — prices from AiFinPay; current cohort and networks
 
 - Payer guide: "Prices come from AiFinPay": how much to send is
