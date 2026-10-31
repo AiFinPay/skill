@@ -6,7 +6,7 @@ description: Pay for x402-gated APIs and sites as an agent (AIFP-1 on an owner-s
   wallet, payment history, prepaid quotas and Agent Passport records through
   the AiFinPay MCP server or SDK.
 license: MIT
-version: 2.12.0
+version: 2.12.1
 author: AiFinPay Support
 metadata:
   hermes:
@@ -112,11 +112,11 @@ network set, verified payout, a served deployment and a working verifier/rate.
 If the backend refuses a network, retain the refusal and ask the owner to
 resolve readiness; do not switch networks or construct a manual payment.
 `@aifinpay/deployments` 2.1.0 (agent 2.10.0 and later) enables the Solana
-mainnet and devnet records; the backend must still serve the network. At the
-2026-10-29 check `/api/payment-capabilities` reported `payment_supported:
-true` only for Polygon, Base and Amoy; Solana, Arc and the other networks
-returned `network_not_served`, BOT Chain `deployment_disabled`. Read it again
-before paying anywhere but Polygon. NEAR, Aptos and current Casper payment
+mainnet and devnet records; the backend must still serve the network.
+`/api/payment-capabilities` lists only the networks it takes payments on, with
+no status fields: a network that is absent is not served, and a row without
+`native` is paid in its listed tokens only. Read it again before paying
+anywhere but Polygon. NEAR, Aptos and current Casper payment
 executors are outside this cohort.
 `botchain` is BOT Chain, not an alias for Robinhood. Wallet derivation on a
 network does not establish payment support.
