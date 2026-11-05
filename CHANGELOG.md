@@ -1,3 +1,8 @@
+## 2.12.2 — the smallest batch is $0.02
+
+- Payer guide: the smallest batch is $0.02 plus gas (40 standard, 10 complex or
+  4 premium requests); examples follow. Prices still come from AiFinPay.
+
 ## 2.12.1 — capability rows without status fields
 
 - Payer guide: `/api/payment-capabilities` lists only networks that take
