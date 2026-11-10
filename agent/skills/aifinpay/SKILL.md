@@ -49,8 +49,9 @@ Node `fetchPaid` (2.1.0+) and Python `fetch_paid` (2.2.0+) execute payments.
 This skill is instructions only. To act on it, one of these must be
 installed — always use the `latest` release:
 
-- **MCP client (Claude Desktop / Cursor / Windsurf):**
-  `npx @aifinpay/mcp`. The server depends on `@aifinpay/agent`
+- **MCP client (Claude Code / Claude Desktop / Cursor / Windsurf):**
+  `npx @aifinpay/mcp`; in Claude Code,
+  `claude mcp add aifinpay -- npx -y @aifinpay/mcp`. The server depends on `@aifinpay/agent`
   and pulls it in automatically — do not install the agent package yourself.
 - **Agent code in Node/TS:**
   `npm install @aifinpay/agent`. Do NOT install the MCP server.
@@ -438,8 +439,10 @@ at https://dash.aifinpay.io → My Agents:
 - **MCP:** the owner clicks **Claim via MCP**, gets a one-time URL and gives it
   to you; call `agent_claim_self({"magic_link_url": "…"})`. The URL reads
   `https://dash.aifinpay.io/api/auth/verify?token=…`: it links this agent and
-  signs nobody in. Without `agent_claim_self` in this session, do not open it;
-  use the address path below. The owner-selected
+  signs nobody in. Without `agent_claim_self` in this session, do not open it.
+  An assistant in an MCP client tells the owner to connect `@aifinpay/mcp`
+  (Prerequisites) and generate a new URL; code on the SDK uses the address
+  path below. The owner-selected
   payment family must be bound successfully; the other wallet is best-effort.
   Binding a wallet does not activate a disabled payment network. Use the
   selected wallet's **Fund** panel for available networks and assets.
