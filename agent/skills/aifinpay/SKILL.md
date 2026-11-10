@@ -6,7 +6,7 @@ description: Pay for x402-gated APIs and sites as an agent (AIFP-1 on an owner-s
   wallet, payment history, prepaid quotas and Agent Passport records through
   the AiFinPay MCP server or SDK.
 license: MIT
-version: 2.12.2
+version: 2.12.3
 author: AiFinPay Support
 metadata:
   hermes:
@@ -192,8 +192,8 @@ checklist as `payment_setup_status` and signs nothing. With AIFINPAY_MODE=dev
 it also exposes dev_payment_quote. Never tell a user a payment was sent
 because a quote or invoice was created.
 
-`settlement_routes` lists the AIFP-1 v1.4 routes first (Polygon and Base,
-`live: true` when served) and the older splitter v1.3 routes under
+`settlement_routes` lists the AIFP-1 v1.4 routes first (`live: true` when
+served) and the older splitter v1.3 routes under
 `legacy_v13`. Only the v1.4 section says whether `payable_fetch` can pay; a
 v1.3 route marked not live does not mean the network is disabled.
 
@@ -517,12 +517,12 @@ Use agent_history. Do not guess /v1/history, /v1/payments or /v1/wallet/tx.
 
 Canonical AIFP-1 economics are gross-inclusive: the agent pays the quoted
 price, AiFinPay takes **1 %** (100 bps) from it, and the merchant receives
-**99 %**. No fixed fee is implied. Production served Polygon and Base
-(splitter v1.4) at the 2026-10-29 baseline check. Additional client descriptors
+**99 %**. No fixed fee is implied. The networks production serves are the rows
+of the issuer's `/api/payment-capabilities`. Client descriptors
 do not prove production activation; check issuer capabilities and merchant
 authorization. This source cohort adds a Solana v1.4 adapter with explicit
 network, asset and fee/rent limits; its published deployment records are
-enabled, but the backend did not serve Solana at that check. The smallest paid batch is $0.02, plus network fees and any
+enabled; whether the backend serves Solana is in the same capabilities read. The smallest paid batch is $0.02, plus network fees and any
 required account rent.
 
 (The older "98.99 / 1 / 0.01" figure was the v1.2 fee-on-top model.)

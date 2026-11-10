@@ -1,3 +1,8 @@
+## 2.12.3 — served networks come from capabilities
+
+- Both guides: the leftover "Production served Polygon and Base" snapshot is
+  removed; the served networks are the rows of `/api/payment-capabilities`.
+
 ## 2.12.2 — the smallest batch is $0.02
 
 - Payer guide: the smallest batch is $0.02 plus gas (40 standard, 10 complex or
