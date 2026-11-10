@@ -1,3 +1,12 @@
+## 2.12.3 — served networks come from capabilities
+
+- Both guides: the leftover "Production served Polygon and Base" snapshot is
+  removed; the served networks are the rows of `/api/payment-capabilities`.
+- Payer guide: a claim URL is named for what it is; without `agent_claim_self`
+  an assistant asks the owner to connect the MCP server, code uses the address
+  path. Claude Code is listed with its connect command; the dashboard steps
+  use the buttons' real names.
+
 ## 2.12.2 — the smallest batch is $0.02
 
 - Payer guide: the smallest batch is $0.02 plus gas (40 standard, 10 complex or

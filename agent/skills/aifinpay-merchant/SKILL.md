@@ -4,7 +4,7 @@ description: Configure an HTTP 402 gate for agent access to a website or API,
   with owner-selected routes, verified payouts and explicitly accepted EVM
   networks. Agents settle from their own wallets; the merchant receives 99%.
 license: MIT
-version: 2.12.2
+version: 2.12.3
 author: AiFinPay Support
 metadata:
   hermes:
@@ -159,14 +159,14 @@ Release target: MCP **2.15.2**, Node SDK **2.11.0**, Python **2.9.0**.
 This coordinated target does not establish publication or reporting rollout.
 Those clients
 reuse the signed v1.4 payment kernel for every EVM network descriptor; network
-metadata does not activate a deployment or verifier. Production served Polygon
-and Base at the 2026-10-29 baseline check of `/api/payment-capabilities`.
-Additional networks require a ready
+metadata does not activate a deployment or verifier. The networks production
+serves are the rows of `/api/payment-capabilities`: read it, do not assume a
+list. A network needs a ready
 backend, pinned deployment/token metadata, a verifier and merchant consent.
 
 The Solana adapter is a source capability in this target. `@aifinpay/deployments`
-2.1.0 enables the Solana records, but the backend did not serve Solana at
-that check. A Solana merchant needs an
+2.1.0 enables the Solana records; whether the backend serves Solana is in the
+same capabilities read. A Solana merchant needs an
 explicit accepted network and verified Solana payout, an accepted program/IDL
 and mint inventory, configured signer/RPC, finalized value verification and
 funded end-to-end acceptance before payments are advertised. Native SOL and
