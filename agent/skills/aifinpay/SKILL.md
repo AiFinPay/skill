@@ -436,13 +436,18 @@ agent's balance, payments and receipts, and can set a daily-spend email alert,
 at https://dash.aifinpay.io → My Agents:
 
 - **MCP:** the owner clicks **Claim via MCP**, gets a one-time URL and gives it
-  to you; call `agent_claim_self({"magic_link_url": "…"})`. The owner-selected
+  to you; call `agent_claim_self({"magic_link_url": "…"})`. The URL reads
+  `https://dash.aifinpay.io/api/auth/verify?token=…`: it links this agent and
+  signs nobody in. Without `agent_claim_self` in this session, do not open it;
+  use the address path below. The owner-selected
   payment family must be bound successfully; the other wallet is best-effort.
   Binding a wallet does not activate a disabled payment network. Use the
   selected wallet's **Fund** panel for available networks and assets.
-- **Node / Python:** the owner uses **Add agent by address** and gives you the
-  challenge; return `agent.signDashboardClaim(challenge)` (Node) or
-  `agent.sign_dashboard_claim(challenge)` (Python). These sign only
+- **Node / Python:** the owner opens **Link an agent**, enters your public
+  wallet address, presses **Get ownership message** and gives you the message;
+  return `agent.signDashboardClaim(challenge)` (Node) or
+  `agent.sign_dashboard_claim(challenge)` (Python) for the owner to paste into
+  **Wallet signature** and press **Link wallet**. These sign only
   `AiFinPay-claim:polygon:<own address>:<nonce>`.
 
 Once the agent is claimed, the dashboard is where the owner manages its
