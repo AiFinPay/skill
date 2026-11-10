@@ -446,8 +446,9 @@ at https://dash.aifinpay.io → My Agents:
   payment family must be bound successfully; the other wallet is best-effort.
   Binding a wallet does not activate a disabled payment network. Use the
   selected wallet's **Fund** panel for available networks and assets.
-- **Node / Python:** the owner opens **Link an agent**, enters your public
-  wallet address, presses **Get ownership message** and gives you the message;
+- **Node / Python:** the owner opens **Link an agent**, then the signed-message
+  option under the one-time URL, enters your public wallet address, presses
+  **Get ownership message** and gives you the message;
   return `agent.signDashboardClaim(challenge)` (Node) or
   `agent.sign_dashboard_claim(challenge)` (Python) for the owner to paste into
   **Wallet signature** and press **Link wallet**. These sign only
