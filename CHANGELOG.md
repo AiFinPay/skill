@@ -1,3 +1,19 @@
+## 2.12.4 — merchant gate examples fill Agent traffic
+
+- Merchant guide: the Express and Python examples create the gate-events
+  reporter (`createGateReporter` / `GateReporter`), pass it to the gate's
+  `onEvent` / `on_event`, and close it at shutdown. Only these events fill the
+  dashboard's Agent traffic report; before, a site set up from the guide
+  showed none.
+- Merchant guide: "Agent traffic: report gate events" replaces "Optional
+  observation and reporting". Reporting v2 is described as what fills the
+  Reports page, not Agent traffic, and a gate refuses it together with
+  `onEvent`; `onEvent` is no longer called legacy. "Verify it works" checks
+  that the test 402 reaches Agent traffic; "Register the site" says where
+  the `msec_…` secret the reporter needs comes from.
+- Reporting release target: gate 0.10.1 / aifinpay-gate 0.7.1, both
+  published (checked 2026-11-12).
+
 ## 2.12.3 — served networks come from capabilities
 
 - Both guides: the leftover "Production served Polygon and Base" snapshot is
