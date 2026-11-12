@@ -6,7 +6,7 @@ description: Pay for x402-gated APIs and sites as an agent (AIFP-1 on an owner-s
   wallet, payment history, prepaid quotas and Agent Passport records through
   the AiFinPay MCP server or SDK.
 license: MIT
-version: 2.12.3
+version: 2.12.4
 author: AiFinPay Support
 metadata:
   hermes:

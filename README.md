@@ -16,10 +16,12 @@ owner's dashboard Controls, and the env values are optional overrides. The MCP
 pays only a merchant with a DNS-verified site, so the merchant guide includes
 verifying the domain.
 Release target: MCP **2.15.2**, Node SDK **2.11.0**, Python **2.9.0**.
-Reporting release target: Node gate **0.8.0**, Python gate **0.5.0**.
-The merchant guide describes explicit opt-in observations, consent, queue loss
-and producer health using the SDK's reporting v2 contract. It adds no MCP tools
-or signing authority and does not establish publication or partner rollout.
+Reporting release target: Node gate **0.10.1**, Python gate **0.7.1**.
+The merchant guide wires the gate-events reporter (`createGateReporter` /
+`GateReporter` on the gate's `onEvent` / `on_event`), which fills the
+dashboard's Agent traffic report; reporting v2 fills the Reports page instead
+and cannot run beside it. It adds no MCP tools or signing authority and does
+not establish partner rollout.
 The payer guide retains the Solana source adapter. Canonical disabled Solana
 records remain unavailable until accepted and served. Its nine EVM descriptors
 require explicit owner and merchant
@@ -31,12 +33,15 @@ Rule of thumb: if the user wants to **pay** for a paid API, load `aifinpay`.
 If they **own** a site/API agents visit, load `aifinpay-merchant` — and mention
 the other side exists.
 
-For merchant reporting, follow the merchant guide's optional reporting section
-and the SDK's [Node](https://github.com/AiFinPay/sdk/blob/main/gate/REPORTING-V2.md)
-or [Python](https://github.com/AiFinPay/sdk/blob/main/python-gate/REPORTING-V2.md)
-instructions. Observation events, admission and resource completion are
-distinct; payments require confirmed settlement evidence. Producer health
-and pending/drop coverage describe telemetry completeness, not payment success.
+For merchant reporting, follow the merchant guide's "Agent traffic: report gate
+events" section and the gate README's opt-in dashboard request reporting
+([Node](https://github.com/AiFinPay/sdk/blob/main/gate/README.md#opt-in-dashboard-request-reporting),
+[Python](https://github.com/AiFinPay/sdk/blob/main/python-gate/README.md#opt-in-dashboard-request-reporting)).
+A reported `serve` is admission, not delivery; payments require confirmed
+settlement evidence. Reporting v2 keeps its own
+[Node](https://github.com/AiFinPay/sdk/blob/main/gate/REPORTING-V2.md) and
+[Python](https://github.com/AiFinPay/sdk/blob/main/python-gate/REPORTING-V2.md)
+instructions.
 
 ## Install
 

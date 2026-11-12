@@ -4,7 +4,7 @@ description: Configure an HTTP 402 gate for agent access to a website or API,
   with owner-selected routes, verified payouts and explicitly accepted EVM
   networks. Agents settle from their own wallets; the merchant receives 99%.
 license: MIT
-version: 2.12.3
+version: 2.12.4
 author: AiFinPay Support
 metadata:
   hermes:
@@ -53,15 +53,24 @@ them:
 
 ```js
 import express from "express";
-import { aifpGate, aifpDiscovery } from "@aifinpay/gate";
+import {
+  aifpGate, aifpDiscovery, createGateReporter, knownAiAgent,
+} from "@aifinpay/gate";
 
 const app = express();
 const merchantId = "mrch_…";   // from the dashboard, see "Register" below
 
+// Fills the dashboard's Agent traffic report. The secret stays on the server.
+const reporter = createGateReporter({
+  merchantId,
+  merchantSecret: process.env.AIFP_MERCHANT_SECRET,
+});
+
 // Charge agents for this route. Humans browsing your site are untouched —
 // the gate only challenges requests that look like an AI agent.
 app.get("/api/agent/data",
-  aifpGate({ merchantId, resource: "/api/agent/data", tier: "standard" }),
+  aifpGate({ merchantId, resource: "/api/agent/data", tier: "standard",
+    shouldCharge: knownAiAgent, onEvent: reporter.onEvent }),
   (req, res) => res.json({ /* your paid data */ }));
 
 // One line so an agent hitting your bare domain discovers the paid routes.
@@ -69,11 +78,34 @@ app.use(aifpDiscovery({
   merchantId,
   resources: [{ resource: "/api/agent/data", tier: "standard" }],
 }));
+
+const server = app.listen(3000);
+process.on("SIGTERM", () => server.close(async () => {
+  await reporter.close();   // sends the last batch
+  process.exit(0);
+}));
 ```
 
 That is it. `aifpGate` returns a 402 with everything an agent needs to pay
 (`how_to_pay`, price, scope). `aifpDiscovery` serves `/.well-known/x402.json` so
 an agent that arrives at just your domain learns which routes cost money.
+`shouldCharge: knownAiAgent` charges self-identifying AI crawlers and agents
+that speak AIFP and serves everyone else free; without it the gate charges
+every caller, people included. The reporter sends each 402 and each agent
+request the gate let through to the dashboard's **Agent traffic** report;
+without it that report stays empty. See "Agent traffic: report gate events"
+below.
+
+### Start in watch mode, then charge
+
+Add `mode: "shadow"` to the gate options (Python `mode="shadow"`) and the
+gate charges nothing: it serves every request, and one it would have refused
+carries `AIFP-Mode: shadow` and `AIFP-Shadow-Status: 402`. It sends the same
+events, so Agent traffic shows which AI companies hit the site and what the
+gate would have done. When the owner decides to charge, change it to
+`mode: "enforce"`, which is also what an omitted `mode` means; any other
+value throws at start. Watch mode needs the gate-events reporter: reporting
+v2 records no challenge for a request served in watch mode.
 
 **Already running x402 (PayAI, Coinbase)?** AiFinPay is not an x402
 facilitator — there is no `/verify` or `/settle` to point your middleware at,
@@ -87,14 +119,21 @@ pip install aifinpay-gate
 ```
 
 ```python
-from aifinpay_gate import AifpGateMiddleware, Gate, Route
+import os
+from aifinpay_gate import (AifpGateMiddleware, Gate, GateReporter, Route,
+                           known_ai_agent)
 
-gate = Gate("mrch_…", routes=[
+merchant_id = "mrch_…"
+reporter = GateReporter(merchant_id=merchant_id,
+                        merchant_secret=os.environ["AIFP_MERCHANT_SECRET"])
+gate = Gate(merchant_id, routes=[
     Route("/api/agent/data", "standard"),
     Route("/create", "premium", methods={"POST"}),
-])
+], should_charge=known_ai_agent, on_event=reporter.on_event)
 app.add_middleware(AifpGateMiddleware, gate=gate)   # FastAPI / Starlette
 # Flask / Django:  app.wsgi_app = AifpGateWSGI(app.wsgi_app, gate)
+# Shutdown hook, after the server stops taking requests:
+# reporter.close(timeout=10.0)
 ```
 
 Same 402, same receipt checks, same metering as `@aifinpay/gate`; it also
@@ -102,7 +141,8 @@ serves `/.well-known/x402.json`. A paid call reaches the handler with
 `request.state.aifp` (ASGI) or `environ["aifp"]` (WSGI). Route patterns are
 exact or end in `/*`. With more than one worker process, pass
 `store=RedisStore(redis.Redis.from_url(...))` — the default counters are
-per process.
+per process — and create the `GateReporter` in each worker, after fork: one
+inherited across a fork refuses to report.
 
 ### Next.js
 
@@ -114,13 +154,18 @@ An adapter that drops them leaves agents unable to pay or to see what is left.
 ```ts
 // middleware.ts
 import { NextResponse, type NextRequest } from "next/server";
-import { createGate, knownAiAgent } from "@aifinpay/gate";
+import { createGate, createGateReporter, knownAiAgent } from "@aifinpay/gate";
 
+const reporter = createGateReporter({
+  merchantId: process.env.AIFP_MERCHANT_ID!,
+  merchantSecret: process.env.AIFP_MERCHANT_SECRET!,
+});
 const gate = createGate({
   merchantId: process.env.AIFP_MERCHANT_ID!,
   registry,             // your paid routes
   store,                // shared, e.g. redisStore(redis)
   shouldCharge: knownAiAgent,
+  onEvent: reporter.onEvent,
 });
 
 export async function middleware(req: NextRequest) {
@@ -137,8 +182,9 @@ export async function middleware(req: NextRequest) {
 export const config = { matcher: ["/api/:path*", "/movies/:path*"] };
 ```
 
-Serve `buildDiscoveryDocument({...})` as JSON from
-`app/.well-known/x402.json/route.ts`. Full reference: the gate README
+Middleware has no shutdown hook, so report rows still queued when the process
+stops are lost; access is not affected. Serve `buildDiscoveryDocument({...})`
+as JSON from `app/.well-known/x402.json/route.ts`. Full reference: the gate README
 (https://github.com/AiFinPay/sdk/tree/main/gate).
 
 ## Discovery ownership and settlement compatibility
@@ -189,20 +235,58 @@ only a merchant whose public record (`GET /v1/merchants/{id}`) has
 host equals the `site_url` host. On the hosted gateway it checks verification
 alone. Otherwise it refuses before signing, and nothing is paid.
 
-## Optional observation and reporting
+## Agent traffic: report gate events
 
-Reporting release target: Node gate **0.8.0**, Python gate **0.5.0**.
-Both were published on 2026-10-29; from these versions every HTML response
-also carries a `Link` header to `/llms.txt` and `/.well-known/x402.json`.
-Use these instructions only after checking the installed packages and the
-backend's reporting v2 readiness. Installing the skill does not enable reporting
-or verify a partner integration. Opt in when the merchant owner requests it:
-Node uses `createGateReporterV2` with `reporting: { version: 2, reporter,
-context }`; Python uses `GateReporterV2` with `Gate(..., reporting=reporter,
-reporting_context=...)`. Keep the existing receipt verification and shared
-quota store. Use one producer per merchant per worker, created after fork in
-Python; do not also attach the legacy `onEvent`/`on_event` reporter or report
-the same request through both hosted and self-hosted instrumentation.
+Reporting release target: Node gate **0.10.1**, Python gate **0.7.1**.
+Both are published (checked 2026-11-12). Since gate 0.8.0 / aifinpay-gate
+0.5.0 every HTML response also carries a `Link` header to `/llms.txt` and
+`/.well-known/x402.json`.
+
+The dashboard's **Agent traffic** report (which AI companies hit the site,
+which were asked to pay, which were served) is filled only by gate events.
+Node: `createGateReporter({ merchantId, merchantSecret })` and
+`onEvent: reporter.onEvent` on the gate; `createGate` (Next.js, other
+frameworks) takes the same `onEvent`. Python:
+`GateReporter(merchant_id=..., merchant_secret=...)` and
+`on_event=reporter.on_event` on `Gate`. The examples above wire it. Without
+it the gate still charges, and that report stays empty.
+
+The reporter sends each `402` and each request the gate admitted (`serve`),
+with the registered route pattern and the normalised AI company
+(`operator`), and nothing else about the request. A `serve` is admission
+before your handler, not proof of a response, of delivered content or of
+payment; payments and revenue come from confirmed settlements. Register the
+same route pattern in the dashboard first; a static mount sets `resource`
+explicitly.
+
+Keep the merchant secret server-side. Report only registered route patterns,
+never full URLs, queries, bodies, raw headers, IPs, receipt JWTs or wallet IDs.
+Use one reporter per merchant per process (per worker, after fork, in Python),
+shared by every gate mount. If you already have a metrics hook, call both
+from one `onEvent`. Do not report the same request through two reporters or
+through both hosted and self-hosted instrumentation.
+Queues are in memory, bounded to 1000 events, with batches of at most 50,
+3-second request deadlines and at most 5 attempts within 15 minutes.
+Retries retain the same event IDs, timestamps and facts; outages, overflow
+and crashes lose report rows, never access. Permanent errors and redirects
+are not retried; fix credentials/configuration before replacing a stopped
+reporter. In the existing shutdown hook, after the server stops taking
+requests, `await reporter.close()` (Python `reporter.close(timeout=10.0)`)
+sends the last batch once; it does not promise delivery. Reporting adds no
+MCP tools or signing authority.
+
+### Reporting v2 fills the Reports page, not Agent traffic
+
+Reporting v2 — Node `createGateReporterV2` with `reporting: { version: 2,
+reporter, context }`, Python `GateReporterV2` with `Gate(...,
+reporting=reporter, reporting_context=...)` — writes the evidence-bound
+stages behind the dashboard's **Reports** page. It does not fill Agent
+traffic, and a gate refuses it together with `onEvent`/`on_event`: Node
+throws "select reporting v2 or onEvent", Python "choose one reporting
+version". Choose it instead of the gate-events reporter only when the
+merchant owner asks for the Reports page, after checking the backend's
+reporting v2 readiness. Installing the skill does not enable reporting or
+verify a partner integration. The rules below apply to v2 only.
 
 Declare only stages the adapter actually observes: `access_challenged` for an
 emitted 402, `access_admitted` before the paid handler, and
@@ -224,13 +308,7 @@ optional `reportingToken`/`reporting_token` reaches only its fixed first-party
 quote endpoints; never manually forward it to merchant, pay, RPC or JWKS
 requests. Reporting failures preserve the original access/payment result.
 
-Keep the merchant secret server-side. Report only registered route patterns,
-never full URLs, queries, bodies, raw headers, IPs, receipt JWTs or wallet IDs.
-Queues are in memory, bounded to 1000 events, with batches of at most 50,
-3-second request deadlines and at most 5 attempts within 15 minutes.
-Retries retain the same event IDs, timestamps and facts; outages, overflow
-and crashes lose observations. Permanent errors and redirects are not retried;
-fix credentials/configuration before replacing a stopped producer.
+The secret, route-pattern and queue rules above apply to the v2 producer too.
 
 Node health auto-samples every 60 seconds; Python normally samples every 5
 seconds. All health attempts are at least 5 seconds apart, and retries may
@@ -245,7 +323,6 @@ flush/close do not promise delivery.
 Read the exact wiring and consent/loss rules before implementation:
 [Node reporting v2](https://github.com/AiFinPay/sdk/blob/main/gate/REPORTING-V2.md)
 and [Python reporting v2](https://github.com/AiFinPay/sdk/blob/main/python-gate/REPORTING-V2.md).
-This reporting target adds no MCP tools or signing authority.
 
 ## Register the site (get your merchant_id)
 
@@ -253,7 +330,11 @@ The gate needs a `merchant_id`. Two ways to get one:
 
 1. **Dashboard (recommended):** sign in at https://aifinpay.io, create a
    merchant, set your payout wallet (EVM and/or Solana address), and copy the
-   `mrch_…` id. This is where you also see what you have earned.
+   `mrch_…` id. This is where you also see what you have earned. The
+   site's `msec_…` secret is shown once at creation; the owner puts it in
+   the server's environment as `AIFP_MERCHANT_SECRET`, which the reporter
+   needs. If it is lost, Settings → API keys → Rotate secret issues a new
+   one and the old one stops working.
 2. **The agent can walk the owner through it:** if you are an agent helping a
    site owner, tell them exactly this —
 
@@ -323,6 +404,17 @@ curl -s https://your-site.com/api/agent/data \
 ```
 
 A normal browser request to the same site stays 200 — humans are not charged.
+In watch mode the agent request is served too, and the header says what
+enforce would answer:
+
+```bash
+curl -s -o /dev/null -D - https://your-site.com/api/agent/data \
+  -H 'user-agent: aifinpay-agent/1.0' | grep -i '^aifp-shadow-status'   # → 402
+```
+
+Once the reporter has sent its batch, that request shows in the dashboard's
+**Agent traffic** report under AiFinPay. If it never does, read
+`reporter.stats` (`lastError` / `last_error`, `stopped`).
 
 Then check that MCP agents will pay:
 
