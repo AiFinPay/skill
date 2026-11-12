@@ -1,10 +1,16 @@
 ## 2.12.4 — merchant gate examples fill Agent traffic
 
-- Merchant guide: the Express and Python examples create the gate-events
-  reporter (`createGateReporter` / `GateReporter`), pass it to the gate's
-  `onEvent` / `on_event`, and close it at shutdown. Only these events fill the
-  dashboard's Agent traffic report; before, a site set up from the guide
-  showed none.
+- Merchant guide: the Express, Python and Next.js examples create the
+  gate-events reporter (`createGateReporter` / `GateReporter`) and pass it to
+  the gate's `onEvent` / `on_event`; Express and Python close it at shutdown.
+  Only these events fill the dashboard's Agent traffic report; before, a site
+  set up from the guide showed none.
+- Merchant guide: the Express and Python examples pass `shouldCharge:
+  knownAiAgent` / `should_charge=known_ai_agent`. Without it the gate charged
+  every caller, so "humans browsing your site are untouched" was not true.
+- Merchant guide: "Start in watch mode, then charge": `mode: "shadow"` serves
+  every request and reports what the gate would have done, `mode: "enforce"`
+  charges. "Verify it works" shows the `AIFP-Shadow-Status` check.
 - Merchant guide: "Agent traffic: report gate events" replaces "Optional
   observation and reporting". Reporting v2 is described as what fills the
   Reports page, not Agent traffic, and a gate refuses it together with

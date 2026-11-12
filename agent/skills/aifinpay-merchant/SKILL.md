@@ -53,7 +53,9 @@ them:
 
 ```js
 import express from "express";
-import { aifpGate, aifpDiscovery, createGateReporter } from "@aifinpay/gate";
+import {
+  aifpGate, aifpDiscovery, createGateReporter, knownAiAgent,
+} from "@aifinpay/gate";
 
 const app = express();
 const merchantId = "mrch_…";   // from the dashboard, see "Register" below
@@ -68,7 +70,7 @@ const reporter = createGateReporter({
 // the gate only challenges requests that look like an AI agent.
 app.get("/api/agent/data",
   aifpGate({ merchantId, resource: "/api/agent/data", tier: "standard",
-    onEvent: reporter.onEvent }),
+    shouldCharge: knownAiAgent, onEvent: reporter.onEvent }),
   (req, res) => res.json({ /* your paid data */ }));
 
 // One line so an agent hitting your bare domain discovers the paid routes.
@@ -86,10 +88,24 @@ process.on("SIGTERM", () => server.close(async () => {
 
 That is it. `aifpGate` returns a 402 with everything an agent needs to pay
 (`how_to_pay`, price, scope). `aifpDiscovery` serves `/.well-known/x402.json` so
-an agent that arrives at just your domain learns which routes cost money. The
-reporter sends each 402 and each agent request the gate let through to the
-dashboard's **Agent traffic** report; without it that report stays empty. See
-"Agent traffic: report gate events" below.
+an agent that arrives at just your domain learns which routes cost money.
+`shouldCharge: knownAiAgent` charges self-identifying AI crawlers and agents
+that speak AIFP and serves everyone else free; without it the gate charges
+every caller, people included. The reporter sends each 402 and each agent
+request the gate let through to the dashboard's **Agent traffic** report;
+without it that report stays empty. See "Agent traffic: report gate events"
+below.
+
+### Start in watch mode, then charge
+
+Add `mode: "shadow"` to the gate options (Python `mode="shadow"`) and the
+gate charges nothing: it serves every request, and one it would have refused
+carries `AIFP-Mode: shadow` and `AIFP-Shadow-Status: 402`. It sends the same
+events, so Agent traffic shows which AI companies hit the site and what the
+gate would have done. When the owner decides to charge, change it to
+`mode: "enforce"`, which is also what an omitted `mode` means; any other
+value throws at start. Watch mode needs the gate-events reporter: reporting
+v2 records no challenge for a request served in watch mode.
 
 **Already running x402 (PayAI, Coinbase)?** AiFinPay is not an x402
 facilitator — there is no `/verify` or `/settle` to point your middleware at,
@@ -104,7 +120,8 @@ pip install aifinpay-gate
 
 ```python
 import os
-from aifinpay_gate import AifpGateMiddleware, Gate, GateReporter, Route
+from aifinpay_gate import (AifpGateMiddleware, Gate, GateReporter, Route,
+                           known_ai_agent)
 
 merchant_id = "mrch_…"
 reporter = GateReporter(merchant_id=merchant_id,
@@ -112,7 +129,7 @@ reporter = GateReporter(merchant_id=merchant_id,
 gate = Gate(merchant_id, routes=[
     Route("/api/agent/data", "standard"),
     Route("/create", "premium", methods={"POST"}),
-], on_event=reporter.on_event)
+], should_charge=known_ai_agent, on_event=reporter.on_event)
 app.add_middleware(AifpGateMiddleware, gate=gate)   # FastAPI / Starlette
 # Flask / Django:  app.wsgi_app = AifpGateWSGI(app.wsgi_app, gate)
 # Shutdown hook, after the server stops taking requests:
@@ -137,13 +154,18 @@ An adapter that drops them leaves agents unable to pay or to see what is left.
 ```ts
 // middleware.ts
 import { NextResponse, type NextRequest } from "next/server";
-import { createGate, knownAiAgent } from "@aifinpay/gate";
+import { createGate, createGateReporter, knownAiAgent } from "@aifinpay/gate";
 
+const reporter = createGateReporter({
+  merchantId: process.env.AIFP_MERCHANT_ID!,
+  merchantSecret: process.env.AIFP_MERCHANT_SECRET!,
+});
 const gate = createGate({
   merchantId: process.env.AIFP_MERCHANT_ID!,
   registry,             // your paid routes
   store,                // shared, e.g. redisStore(redis)
   shouldCharge: knownAiAgent,
+  onEvent: reporter.onEvent,
 });
 
 export async function middleware(req: NextRequest) {
@@ -160,8 +182,9 @@ export async function middleware(req: NextRequest) {
 export const config = { matcher: ["/api/:path*", "/movies/:path*"] };
 ```
 
-Serve `buildDiscoveryDocument({...})` as JSON from
-`app/.well-known/x402.json/route.ts`. Full reference: the gate README
+Middleware has no shutdown hook, so report rows still queued when the process
+stops are lost; access is not affected. Serve `buildDiscoveryDocument({...})`
+as JSON from `app/.well-known/x402.json/route.ts`. Full reference: the gate README
 (https://github.com/AiFinPay/sdk/tree/main/gate).
 
 ## Discovery ownership and settlement compatibility
@@ -381,8 +404,15 @@ curl -s https://your-site.com/api/agent/data \
 ```
 
 A normal browser request to the same site stays 200 — humans are not charged.
+In watch mode the agent request is served too, and the header says what
+enforce would answer:
 
-Once the reporter has sent its batch, that 402 shows in the dashboard's
+```bash
+curl -s -o /dev/null -D - https://your-site.com/api/agent/data \
+  -H 'user-agent: aifinpay-agent/1.0' | grep -i '^aifp-shadow-status'   # → 402
+```
+
+Once the reporter has sent its batch, that request shows in the dashboard's
 **Agent traffic** report under AiFinPay. If it never does, read
 `reporter.stats` (`lastError` / `last_error`, `stopped`).
 
