@@ -1,3 +1,10 @@
+## 2.12.5 — no fixed fee rate
+
+- Both guides: the AIFP-1 fee is described as included in the quoted price,
+  with the exact merchant/protocol split shown in each quote and on-chain
+  transaction. The fixed 1% / 99% figures are removed; the fee is set per
+  merchant.
+
 ## 2.12.4 — merchant gate examples fill Agent traffic
 
 - Merchant guide: the Express, Python and Next.js examples create the

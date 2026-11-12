@@ -6,7 +6,7 @@ description: Pay for x402-gated APIs and sites as an agent (AIFP-1 on an owner-s
   wallet, payment history, prepaid quotas and Agent Passport records through
   the AiFinPay MCP server or SDK.
 license: MIT
-version: 2.12.4
+version: 2.12.5
 author: AiFinPay Support
 metadata:
   hermes:
@@ -525,8 +525,9 @@ Use agent_history. Do not guess /v1/history, /v1/payments or /v1/wallet/tx.
 ```
 
 Canonical AIFP-1 economics are gross-inclusive: the agent pays the quoted
-price, AiFinPay takes **1 %** (100 bps) from it, and the merchant receives
-**99 %**. No fixed fee is implied. The networks production serves are the rows
+price. A protocol fee is included in that price, and each quote
+(`fee_policy`) and the on-chain transaction show the exact split between the
+merchant and the protocol. The networks production serves are the rows
 of the issuer's `/api/payment-capabilities`. Client descriptors
 do not prove production activation; check issuer capabilities and merchant
 authorization. This source cohort adds a Solana v1.4 adapter with explicit
@@ -534,7 +535,7 @@ network, asset and fee/rent limits; its published deployment records are
 enabled; whether the backend serves Solana is in the same capabilities read. The smallest paid batch is $0.02, plus network fees and any
 required account rent.
 
-(The older "98.99 / 1 / 0.01" figure was the v1.2 fee-on-top model.)
+(The legacy v1.2 bridge added its fee on top of the price.)
 
 Routes:
 
