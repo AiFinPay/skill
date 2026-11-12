@@ -655,7 +655,7 @@ number:
 
 ```
 Pay 0.211075111078277 POL ($0.02) for 40 requests to /api/agent/genres
-(incl. 1.00% fee), valid until 2026-09-04T13:00:00Z.
+(incl. <fee>% fee), valid until 2026-09-04T13:00:00Z.
 ```
 
 It states the on-chain figure and the USD, the fee as a rate, and the scope in
