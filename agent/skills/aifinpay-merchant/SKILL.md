@@ -2,9 +2,9 @@
 name: aifinpay-merchant
 description: Configure an HTTP 402 gate for agent access to a website or API,
   with owner-selected routes, verified payouts and explicitly accepted EVM
-  networks. Agents settle from their own wallets; the merchant receives 99%.
+  networks. Agents settle from their own wallets straight to the merchant's payout wallet.
 license: MIT
-version: 2.12.4
+version: 2.12.5
 author: AiFinPay Support
 metadata:
   hermes:
@@ -38,8 +38,10 @@ traffic today and getting nothing back.
 
 Today an AI agent hits your API, scrapes the data, and pays you nothing while
 burning your bandwidth. With AiFinPay, the same request returns an **HTTP 402**,
-the agent settles on-chain from its own wallet, and you receive **99%** of the
-price (AiFinPay takes 1%, no fixed fee). Non-custodial — the money goes agent →
+the agent settles on-chain from its own wallet, and the payment goes to your
+payout wallet. A protocol fee is included in the quoted price; each quote and
+the on-chain transaction show the exact split between you and the protocol.
+Non-custodial — the money goes agent →
 you directly.
 
 ## The whole thing is one middleware
@@ -339,7 +341,7 @@ The gate needs a `merchant_id`. Two ways to get one:
    site owner, tell them exactly this —
 
    > "You have agent traffic you are not charging for. AiFinPay lets you take
-   > 99% of a per-request fee, settled on-chain, non-custodial. Sign in at
+   > a per-request fee, settled on-chain straight to your wallet, non-custodial. Sign in at
    > aifinpay.io, create a merchant, add your payout wallet and site URL,
    > publish the DNS TXT record the dashboard shows, and give me the `mrch_`
    > id — I will gate your routes."
@@ -375,7 +377,7 @@ them the record the dashboard shows and never invent one.
 
 | decision | why it matters |
 |---|---|
-| **payout wallet** | where the 99% lands. EVM address (same on every EVM chain) and/or a Solana address. Set in the dashboard. |
+| **payout wallet** | where your share of each payment lands. EVM address (same on every EVM chain) and/or a Solana address. Set in the dashboard. |
 | **accepted payment networks** | an explicit set plus a default; the backend intersects it with verified payouts and served deployments. A wallet address alone does not grant network consent. |
 | **which routes cost money** | gate the agent/data endpoints; leave human pages open. The gate only challenges agent-shaped requests, so humans are never blocked. |
 | **price per route** | a `tier` (standard / complex / premium) sets the per-request price. Change it in the dashboard without redeploying. |
@@ -386,8 +388,9 @@ them the record the dashboard shows and never invent one.
    price and how to pay.
 2. The agent gets a quote, settles **on-chain from its own wallet** to the
    splitter contract.
-3. The contract splits atomically: **99% to your payout wallet**, 1% to
-   AiFinPay, in the same transaction.
+3. The contract splits atomically, in the same transaction: your share goes
+   **to your payout wallet**, the protocol fee to AiFinPay. The quote and the
+   transaction show the exact split.
 4. The agent retries with a receipt; your gate verifies it and serves the data.
 
 You never touch the agent's funds, and AiFinPay never holds yours. The split
