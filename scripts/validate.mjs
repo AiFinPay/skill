@@ -6,27 +6,33 @@ const skillsRoot = join(root, "agent", "skills");
 const skills = ["aifinpay", "aifinpay-merchant"];
 const version = JSON.parse(readFileSync(join(root, "package.json"), "utf8")).version;
 let failed = false;
-const targetsBySurface = new Map();
-const targetPattern = /^Release target: MCP \*\*(\d+\.\d+\.\d+)\*\*, Node SDK \*\*(\d+\.\d+\.\d+)\*\*, Python \*\*(\d+\.\d+\.\d+)\*\*\.$/gm;
-const reportingTargetPattern = /^Reporting release target: Node gate \*\*(\d+\.\d+\.\d+)\*\*, Python gate \*\*(\d+\.\d+\.\d+)\*\*\.$/gm;
-const reportingTargetsBySurface = new Map();
+// A guide names no current, target or baseline version, and its commands install the latest release.
+const STALE_CLAIMS = [
+  [/release target/i, "a release target"],
+  [/published baseline/i, "a publication baseline"],
+  [/released and current|current (?:npm |pypi )?release/i, "a current-release claim"],
+  [/\bchecked \d{4}-\d{2}-\d{2}/, "a dated publication check"],
+  [/`@?aifinpay[\w/-]*`? \d+\.\d+\.x/, "a version-series label"],
+  [/(?:@aifinpay\/[a-z-]+@|aifinpay-(?:agent|gate)==)\d/, "a pinned package version"],
+];
 
-function checkTargets(name, text) {
-  const targets = [...text.matchAll(targetPattern)];
-  if (targets.length !== 1 || text.includes("Released and current:")) {
-    console.error(`FAIL: ${name}: requires one explicit cohort release target, not a current-release claim`);
+function checkLatest(name, text) {
+  const fail = (message) => {
+    console.error(`FAIL: ${name}: ${message}`);
     failed = true;
-  } else {
-    targetsBySurface.set(name, targets[0].slice(1).join("/"));
+  };
+  for (const [pattern, what] of STALE_CLAIMS) {
+    const found = text.match(pattern);
+    if (found) fail(`names ${what} ("${found[0]}")`);
   }
-  if (name !== "aifinpay") {
-    const reportingTargets = [...text.matchAll(reportingTargetPattern)];
-    if (reportingTargets.length !== 1) {
-      console.error(`FAIL: ${name}: requires one explicit reporting gate release target`);
-      failed = true;
-    } else {
-      reportingTargetsBySurface.set(name, reportingTargets[0].slice(1).join("/"));
-    }
+  for (const [, rest] of text.matchAll(/npx(?: -y)? @aifinpay\/mcp(\S*)/g)) {
+    if (!rest.startsWith("@latest")) fail("an npx command must run @latest");
+  }
+  for (const [, pkg, rest] of text.matchAll(/npm install @aifinpay\/(agent|gate|skill)(\S*)/g)) {
+    if (!rest.startsWith("@latest")) fail(`npm install @aifinpay/${pkg} must install @latest`);
+  }
+  for (const [, upgrade, pkg] of text.matchAll(/pip install (-U )?aifinpay-(agent|gate)/g)) {
+    if (!upgrade) fail(`pip install aifinpay-${pkg} must upgrade (-U)`);
   }
 }
 
@@ -62,12 +68,10 @@ for (const name of skills) {
     console.error(`FAIL: ${name}: frontmatter version ${skillVersion} differs from package ${version}`);
     failed = true;
   }
-  checkTargets(name, text);
-  if (name === "aifinpay") {
-    if (!/^Published baseline checked \d{4}-\d{2}-\d{2}: MCP \*\*\d+\.\d+\.\d+\*\*, Node SDK \*\*\d+\.\d+\.\d+\*\*\.$/m.test(text)) {
-      console.error("FAIL: payer guide requires a dated publication baseline");
-      failed = true;
-    }
+  checkLatest(name, text);
+  if (name === "aifinpay" && !text.includes("\n## Always the latest release\n")) {
+    console.error("FAIL: payer guide requires the section \"Always the latest release\"");
+    failed = true;
   }
   if (text.includes("aifinpay.company") && !text.includes("retired")) {
     console.error(`FAIL: ${name}: references retired domain without noting retirement`);
@@ -76,15 +80,7 @@ for (const name of skills) {
   console.log(`ok: ${name} (${text.length} chars)`);
 }
 
-checkTargets("README.md", readFileSync(join(root, "README.md"), "utf8"));
-if (new Set(targetsBySurface.values()).size > 1) {
-  console.error("FAIL: payer, merchant and README cohort targets differ");
-  failed = true;
-}
-if (new Set(reportingTargetsBySurface.values()).size > 1) {
-  console.error("FAIL: merchant and README reporting gate targets differ");
-  failed = true;
-}
+checkLatest("README.md", readFileSync(join(root, "README.md"), "utf8"));
 const changelog = readFileSync(join(root, "CHANGELOG.md"), "utf8");
 if (!changelog.startsWith(`## ${version} — `)) {
   console.error("FAIL: changelog must label the package version in its first release entry");

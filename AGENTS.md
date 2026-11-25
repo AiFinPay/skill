@@ -12,4 +12,4 @@ Published skill package: `agent/skills/aifinpay/SKILL.md` (payer) + `agent/skill
 
 ## Rules
 - Keep instructions aligned with shipped packages and the gated MCP tool inventory; never document ungated signing or unverified settlement.
-- Bump package, lock, plugin manifest versions and CHANGELOG together when shipped files change. `npm test` validates metadata. Keep a future package cohort labelled as a release target; use dated publication baselines instead of a false current-release claim.
+- Bump package, lock, plugin manifest versions and CHANGELOG together when shipped files change. `npm test` validates metadata. The guides name no current, target or baseline package version: commands install `@latest` (npm) or upgrade (`pip install -U`), and a version number appears only as a minimum ("X and later"). `npm test` enforces it.

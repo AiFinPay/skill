@@ -30,7 +30,7 @@ function replace(fixture, path, before, after) {
   writeFileSync(filename, original.replace(before, after));
 }
 
-test("the coordinated candidate passes its metadata guard", () => {
+test("the package passes its metadata guard", () => {
   const result = validateFixture();
   assert.equal(result.status, 0, result.output);
 });
@@ -38,22 +38,22 @@ test("the coordinated candidate passes its metadata guard", () => {
 const version = JSON.parse(readFileSync(join(root, "package.json"), "utf8")).version;
 const payer = "agent/skills/aifinpay/SKILL.md";
 const merchant = "agent/skills/aifinpay-merchant/SKILL.md";
-const cohort = readFileSync(join(root, payer), "utf8").match(/^Release target:.+$/m)[0];
-const reporting = readFileSync(join(root, merchant), "utf8").match(/^Reporting release target:.+$/m)[0];
-const baseline = readFileSync(join(root, payer), "utf8").match(/^Published baseline checked.+$/m)[0];
-
 for (const [name, path, before, after, diagnostic] of [
   ["payer version drift", payer, `version: ${version}`, "version: 0.0.0", /frontmatter version/],
   ["merchant version drift", merchant, `version: ${version}`, "version: 0.0.0", /frontmatter version/],
   ["lock version drift", "package-lock.json", `"version": "${version}"`, '"version": "0.0.0"', /package-lock root versions/],
   ["plugin version drift", ".claude-plugin/plugin.json", `"version": "${version}"`, '"version": "0.0.0"', /plugin.json version/],
   ["marketplace version drift", ".claude-plugin/marketplace.json", `"version": "${version}"`, '"version": "0.0.0"', /marketplace.json.*version/],
-  ["merchant cohort drift", merchant, cohort, cohort.replace(/MCP \*\*[^*]+\*\*/, "MCP **0.0.0**"), /cohort targets differ/],
-  ["README cohort drift", "README.md", cohort, cohort.replace(/Python \*\*[^*]+\*\*/, "Python **0.0.0**"), /cohort targets differ/],
-  ["reporting gate cohort drift", "README.md", reporting, reporting.replace(/Node gate \*\*[^*]+\*\*/, "Node gate **0.0.0**"), /reporting gate targets differ/],
-  ["duplicate release target", payer, cohort, `${cohort}\n${cohort}`, /one explicit cohort release target/],
-  ["undated publication claim", payer, baseline, baseline.replace(/ checked \d{4}-\d{2}-\d{2}/, ""), /dated publication baseline/],
-  ["current-release claim", payer, cohort, `${cohort}\nReleased and current:`, /current-release claim/],
+  ["release target", payer, "## Always the latest release", "Release target: MCP **9.9.9**.\n\n## Always the latest release", /names a release target/],
+  ["publication baseline", merchant, "## Agent traffic: report gate events", "Published baseline: gate 9.9.9.\n\n## Agent traffic: report gate events", /names a publication baseline/],
+  ["current-release claim", "README.md", "# @aifinpay/skill", "# @aifinpay/skill\n\nCurrent npm release: 9.9.9.", /names a current-release claim/],
+  ["dated publication check", merchant, "## Agent traffic: report gate events", "Both are published (checked 2026-11-12).\n\n## Agent traffic: report gate events", /names a dated publication check/],
+  ["version-series label", payer, "| MCP `@aifinpay/mcp` |", "| MCP `@aifinpay/mcp` 9.9.x |", /names a version-series label/],
+  ["pinned command", payer, "claude mcp add aifinpay -- npx -y @aifinpay/mcp@latest", "claude mcp add aifinpay -- npx -y @aifinpay/mcp@9.9.9", /names a pinned package version/],
+  ["bare npx", payer, "claude mcp add aifinpay -- npx -y @aifinpay/mcp@latest", "claude mcp add aifinpay -- npx -y @aifinpay/mcp", /an npx command must run @latest/],
+  ["bare npm install", merchant, "npm install @aifinpay/gate@latest\n```", "npm install @aifinpay/gate\n```", /must install @latest/],
+  ["pip without upgrade", merchant, "pip install -U aifinpay-gate\n```", "pip install aifinpay-gate\n```", /must upgrade/],
+  ["missing latest section", payer, "## Always the latest release", "## Versions", /requires the section/],
   ["changelog version drift", "CHANGELOG.md", `## ${version}`, "## 0.0.0", /changelog must label the package version/],
 ]) {
   test(`reject ${name}`, () => {

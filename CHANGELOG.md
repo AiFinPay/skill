@@ -1,3 +1,22 @@
+## 2.13.0 — always the latest release
+
+- Both guides and the README name no current, target or baseline package
+  version. "Release target: MCP 2.15.2, Node SDK 2.11.0, Python 2.9.0", the
+  dated publication baselines and the `2.15.x` / `2.11.x` / `2.9.x` labels are
+  removed: they were several releases behind what npm and PyPI serve.
+- Every command installs the latest release: `npx -y @aifinpay/mcp@latest`
+  (also in the MCP client config and the `init` commands),
+  `npm install @aifinpay/agent@latest`, `npm install @aifinpay/gate@latest`,
+  `pip install -U aifinpay-agent`, `pip install -U aifinpay-gate`.
+- Payer guide: "Always the latest release" replaces "Version and release
+  status". It says why `@latest` stays in the command, that a running MCP
+  server updates only when the client restarts, how to read what is
+  published, and that an agent whose package lacks something the guide names
+  tells the owner to update instead of working around it.
+- `npm test` refuses a release target, a publication baseline, a
+  current-release claim, a pinned package version and an install command
+  that does not ask for the latest release.
+
 ## 2.12.5 — no fixed fee rate
 
 - Both guides: the AIFP-1 fee is described as included in the quoted price,
