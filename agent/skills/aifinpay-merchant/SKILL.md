@@ -4,7 +4,7 @@ description: Configure an HTTP 402 gate for agent access to a website or API,
   with owner-selected routes, verified payouts and explicitly accepted EVM
   networks. Agents settle from their own wallets straight to the merchant's payout wallet.
 license: MIT
-version: 2.12.5
+version: 2.13.0
 author: AiFinPay Support
 metadata:
   hermes:
@@ -47,7 +47,7 @@ you directly.
 ## The whole thing is one middleware
 
 ```bash
-npm install @aifinpay/gate
+npm install @aifinpay/gate@latest
 ```
 
 Gate the routes an agent should pay for, and mount discovery once so agents find
@@ -117,7 +117,7 @@ route by header: a request carrying `AIFP-Receipt` goes to AiFinPay.
 ### Python (FastAPI, Starlette, Flask, Django)
 
 ```bash
-pip install aifinpay-gate
+pip install -U aifinpay-gate
 ```
 
 ```python
@@ -198,21 +198,19 @@ your code; installing gate does not upload their catalog to AiFinPay. Publish
 a relative URL. Keep dev and production catalogs separate. An API catalog such
 as `/api/agent` can additionally describe query/body parameters.
 
-Gate 0.3.3 source adds `instructions_url` (payer skill),
+The gate's 402 carries `instructions_url` (payer skill),
 `merchant_instructions_url` (this skill), and `documentation_url`. These are
 links to maintained public instructions, not stored wallet or receipt data.
-Existing sites must upgrade/redeploy gate to emit those new fields.
+A site on an old gate must update and redeploy to emit them.
 
-Release target: MCP **2.15.2**, Node SDK **2.11.0**, Python **2.9.0**.
-This coordinated target does not establish publication or reporting rollout.
-Those clients
+The MCP, the Node SDK and the Python SDK
 reuse the signed v1.4 payment kernel for every EVM network descriptor; network
 metadata does not activate a deployment or verifier. The networks production
 serves are the rows of `/api/payment-capabilities`: read it, do not assume a
 list. A network needs a ready
 backend, pinned deployment/token metadata, a verifier and merchant consent.
 
-The Solana adapter is a source capability in this target. `@aifinpay/deployments`
+The clients carry the Solana adapter. `@aifinpay/deployments`
 2.1.0 enables the Solana records; whether the backend serves Solana is in the
 same capabilities read. A Solana merchant needs an
 explicit accepted network and verified Solana payout, an accepted program/IDL
@@ -230,7 +228,7 @@ network until their owner updates them. Read the selected issuer's
 payment readiness. Do not change a payout wallet, accepted network set or
 settlement version without the merchant owner's authorization.
 
-MCP `payable_fetch` (2.12.1 and later) also needs a verified site. Unless the
+MCP `payable_fetch` also needs a verified site. Unless the
 agent's owner allowlisted the origin with `AIFINPAY_GATEWAY_ORIGINS`, it pays
 only a merchant whose public record (`GET /v1/merchants/{id}`) has
 `site_verified: true`, and for a self-hosted gate only when the fetched URL's
@@ -239,10 +237,11 @@ alone. Otherwise it refuses before signing, and nothing is paid.
 
 ## Agent traffic: report gate events
 
-Reporting release target: Node gate **0.10.1**, Python gate **0.7.1**.
-Both are published (checked 2026-11-12). Since gate 0.8.0 / aifinpay-gate
-0.5.0 every HTML response also carries a `Link` header to `/llms.txt` and
-`/.well-known/x402.json`.
+Run the latest `@aifinpay/gate` or `aifinpay-gate` and update it when a new
+release is out (`npm install @aifinpay/gate@latest`,
+`pip install -U aifinpay-gate`): an old gate lacks the reporter, watch mode
+and the newer 402 fields. Every HTML response also carries a `Link` header to
+`/llms.txt` and `/.well-known/x402.json`.
 
 The dashboard's **Agent traffic** report (which AI companies hit the site,
 which were asked to pay, which were served) is filled only by gate events.

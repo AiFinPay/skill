@@ -9,14 +9,16 @@ any client that loads `SKILL.md`).
 | `aifinpay` | Paying — agent buys x402-gated API access | `agent/skills/aifinpay/SKILL.md` |
 | `aifinpay-merchant` | Earning — merchant charges agents per request | `agent/skills/aifinpay-merchant/SKILL.md` |
 
-Version **2.12.0** describes MCP 2.15.2, where payments are on by default from
+The guides are used with the latest published packages and name no current
+version: every command installs `@latest` (npm) or upgrades (`pip install
+-U`), and the payer guide tells an agent whose package is old to update
+instead of working around it.
+MCP payments are on by default from
 a persistent wallet within a built-in ceiling ($5 per payment, $20 per day):
 the first-payment path is init → fund → link → pay, the working limits are the
 owner's dashboard Controls, and the env values are optional overrides. The MCP
 pays only a merchant with a DNS-verified site, so the merchant guide includes
 verifying the domain.
-Release target: MCP **2.15.2**, Node SDK **2.11.0**, Python **2.9.0**.
-Reporting release target: Node gate **0.10.1**, Python gate **0.7.1**.
 The merchant guide wires the gate-events reporter (`createGateReporter` /
 `GateReporter` on the gate's `onEvent` / `on_event`), which fills the
 dashboard's Agent traffic report; reporting v2 fills the Reports page instead
@@ -26,8 +28,7 @@ The payer guide retains the Solana source adapter. Canonical disabled Solana
 records remain unavailable until accepted and served. Its nine EVM descriptors
 require explicit owner and merchant
 network consent plus backend readiness; installing instructions does not
-activate networks. Historical published baselines are dated in the payer
-guide and do not claim the target packages have already been published.
+activate networks.
 
 Rule of thumb: if the user wants to **pay** for a paid API, load `aifinpay`.
 If they **own** a site/API agents visit, load `aifinpay-merchant` — and mention
@@ -58,7 +59,7 @@ and only within the limits and sites you configured for the MCP server.
 You can also install the npm package:
 
 ```bash
-npm install @aifinpay/skill
+npm install @aifinpay/skill@latest
 ```
 
 ### Claude Code marketplace
@@ -192,7 +193,7 @@ Skill markdown is authored once and mirrored:
 
 If a CLI command, tool name, or settlement behavior changes, update all three
 in coordinated PRs and bump this package's version + CHANGELOG together.
-MCP verifies installed/bundled/served bytes and the exact release target;
+MCP verifies the installed, bundled and served bytes of this package;
 publish this package before refreshing MCP's real registry dependency lock.
 
 ## Version gate
